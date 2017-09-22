@@ -15,6 +15,7 @@ import csv
 from Agent import Agent
 from ProblemSet import ProblemSet
 from RavensGrader import grade
+import ipdb
 
 def getNextLine(r):
     return r.readline().rstrip()
@@ -51,6 +52,7 @@ def solve():
                                                 # Your agent should return its answer at the conclusion of the execution of Solve.
 
                 results.write("%s,%s,%d\n" % (set.name, problem.name, answer))
+                ipdb.set_trace()
     r.close()
 
 # The main execution will have your agent generate answers for all the problems,
