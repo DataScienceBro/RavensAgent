@@ -3,26 +3,81 @@ import numpy as np
 import ipdb
 import copy
 
+from AttributeTypes import attrGen
+
 class SemNode:
     objectIDs = 0
-    sizeMap = {'very small': 0, 'small': 1, 'medium': 2, 'large': 3, 'very large': 4,'huge': 5}
 
-    def __init__(self, ravObj, alias = None):
-        if not alias:
-            self.id = SemNode.objectIDs
-            SemNode.objectIDs += 1
+    @staticmethod
+    def convert(ravObj, alias = None):
+        nID = None
+        if alias:
+            nID = alias.id
         else:
-            self.id = alias.id
-        self.attributes = {}
-        for attrName, attrVal in ravObj.items():
-            if attrName is 'size':
-                self.attributes['size'] = SemNode.sizeMap[attrVal]
-            elif attrName is 'alignment':
-                aligns = attrVal.split('-')
-                self.attributes['vAlign'] = aligns[0]
-                self.attributes['hAlign'] = aligns[1]
-            else:
-                self.attributes[attrName] = attrVal
+            nID = SemNode.objectIDs
+            SemNode.objectIDs += 1
+
+        nodeAttrs = {}
+        for attrName, attrVal in ravObj.attributes.items():
+            attrGen(nodeAttrs, attrName, attrVal)
+
+        return SemNode(nID, 1, nodeAttrs)
+
+    def __init__(self, id, status, attributes):
+        self.id = id
+        self.status = status
+        self.attributes = attributes
+
+    def __sub__(self, other):
+        # self - other
+        # print('subtracting semnodes\n\t', self, 'and\n\t', other)
+        # ipdb.set_trace()
+
+        if other == 0:
+            return copy.deepcopy(self)
+
+        # if self == 0:
+        #     return SemNode(other.id, other.attributes, -1)
+
+        if self.status == other.status:
+            # 0 status change
+            print('no status change')
+            if self.id != other.id:
+                raise ValueError('Node Subtraction: Incorrect Index!', self, other)
+
+            sAttr = self.attributes
+            oAttr = other.attributes
+            newAttr = {}
+
+            for attrName in sAttr:
+                if attrName in oAttr:
+                    # print(attrName, 'is in both', sAttr, oAttr)
+                    # Shape Subt, Fill Subt, Size Subt...
+                    newAttr[attrName] = sAttr[attrName] - oAttr[attrName]
+                else:
+                    newAttr[attrName] = sAttr[attrName]
+
+
+            for attrName in oAttr:
+                if not attrName in sAttr:
+                    newAttr[attrName] = 0 - oAttr[attrName]
+
+            return SemNode(self.id, 0, newAttr)
+
+        raise ValueError('Node Subtraction: Invalid Status!', self, other)
+
+    def __rsub__(self, other):
+        if other == 0:
+            return SemNode(self.id, self.attributes, -1)
+        else:
+            raise ValueError('Node Subtraction: Inconsistent Types!', self, other)
+
+    def __str__(self):
+        return '(id{0}, st{1}) - {2}'.format(self.id, self.status, self.attributes)
+        # return 'id:', str(self.id),'status:',str(self.status), 'attr:',str(self.attributes)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 # class SemEdge:
@@ -39,56 +94,43 @@ class SemNode:
 
 class SemNet:
 
+    @staticmethod
+    def generate(ravenFigure, dim, allNodes, dualOMaps):
+        adjMat = np.zeros((dim, dim), dtype=object)
 
-    def __init__(self, rFigure, dim):
-        self.adjMat = np.zeros((dim, dim), dtype=object)
-        self.nodes = {}
+        # print('got omap')
+        for objName, objVal in ravenFigure.objects.items():
 
-        for objName, objVal in rFigure.objects.items():
-            self.nodes[objName] = SemNode(objVal)
+            n = None
+            if dualOMaps:
+                aliasName = dualOMaps[1][objName]
+                n = SemNode.convert(objVal, allNodes[aliasName])
+            else:
+                n = SemNode.convert(objVal)
+            allNodes[objName]= n
+            adjMat[n.id][n.id] = n
+        return SemNet(adjMat)
 
+    def __init__(self, adjMat = 0):
+        # print('creating semnet', type(adjMat))
+        self.adjMat = adjMat
 
-#     def genAdjMatInit(cls, dim):
-#         return cls(np.empty((dim, dim), dtype=object))
+    def __sub__(self, other):
+        # print('subtacting two sem nets', type(self.adjMat), type(other.adjMat))
+        return SemNet(self.adjMat - other.adjMat)
 
+    def __rsub__(self, other):
+        return other - self
 
+    def __str__(self):
+        return str(self.adjMat)
 
-#     def __sub__(self, other):
-#         return SemNet(self.adjMat - other.adjMat)
-
-#     def __add__(self, other):
-#         return SemNet(self.adjMat + other.adjMat)
-
-# class SemObject:
-#     def __init__(self, attributes):
-#         self.attributes = attributes
-
-#     def __sub__(self, other):
-#         result = {}
-#         for key, val in self.attributes:
-#             result[key] =
-
-
-                # (A, C) => {shape: (square, circle)}
-                # (B, D) => {}
-                # (E, F) => {}
-
-                 # [
-                #   {
-                #       A: {shape: square, fill: solid, align: topLeft},
-                #       B: {shape: circle, fill: empty, align: topRight}
-                #       E: {shape: triangle, above: 'a,b'}
-                #   },
-                #   {
-                #       C: {shape: circle, fill: solid, align: topLeft},
-                #       D: {shape: square, fill: empty, align: topRight},
-                #       F: {shape: triangle, leftOf: 'a,b'}
-                #   }
-                # ]
+    def __repr__(self):
+        return self.__str__()
 
 
-                # cfigureList = []
-                # for fName in kR:
+
+
 
 
 

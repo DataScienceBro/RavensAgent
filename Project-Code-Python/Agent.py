@@ -51,6 +51,8 @@ class Agent:
             'C': ['1', '2', '3', '4', '5', '6'],
         }
 
+        dualObjectMaps = {}
+
         maxObjs = -1
         for node0, neighbors in rel.items():
             objs0 = len(problem.figures[node0].objects)
@@ -58,22 +60,40 @@ class Agent:
             for node1 in neighbors:
                 objs1 = len(problem.figures[node1].objects)
                 maxObjs = max(objs1, maxObjs)
-        ipdb.set_trace()
 
-        objectMaps = {}
-        allSemNets = {}
+                key = node0 + node1
 
+                figures = [problem.figures[fName] for fName in key]
+                oMap, invOMap = extractObjectMap(figures)
+                dualObjectMaps[key] = (oMap, invOMap)
+
+
+        Nets = {}
+        allNodes = {}
+
+        blah = (('A', None), ('B', 'AB'), ('C', 'AC'), ('1', 'C1') , ('2', 'C2'), ())
+
+        # compare AB TO C1, C2, C3, C4, C5, C6
 
         # for figName, figObj in problem.figures.items():
-        allSemNets['A'] = SemNet(problem.figures['A'], maxObjs)
-        allSemNets['B'] = SemNet(problem.figures['A'], maxObjs, objectMaps[])
+        Nets['A'] = SemNet.generate(problem.figures['A'], maxObjs, allNodes, None) # semnet for which all other objects will be based
+        Nets['B'] = SemNet.generate(problem.figures['B'], maxObjs, allNodes, dualObjectMaps['AB'])
+        Nets['C'] = SemNet.generate(problem.figures['C'], maxObjs, allNodes, dualObjectMaps['AC'])
+        Nets['1'] = SemNet.generate(problem.figures['1'], maxObjs, allNodes, dualObjectMaps['C1'])
+        BARelation = Nets['B'] - Nets['A']
+        C1Relation = Nets['1'] - Nets['C']
+
+
+        ipdb.set_trace()
+
+
 
         for unknownR, knownR in relations.items():
             # extrapolate object mapping/translations from given relations' figures
             for kR in knownR:
                 figures = [problem.figures[fName] for fName in kR]
                 oM = extractObjectMap(figures)
-                objectMaps[kR]
+                dualObjectMaps[kR]
 
 
 
@@ -84,7 +104,7 @@ class Agent:
 
 
 
-                ipdb.set_trace()
+
 
                 dim = SemNode.objectIDs
 
@@ -98,8 +118,9 @@ class Agent:
 # matching shapes
 def extractObjectMap(figures):
     if len(figures) is 2:
-        print('2x2 matrix')
+        # print('extracted Object Map')
         objectMap = {}
+        invObjectMap = {}
         fig0 = copy.deepcopy(figures[0].objects)
         fig1 = copy.deepcopy(figures[1].objects)
 
@@ -107,84 +128,43 @@ def extractObjectMap(figures):
             if not fig1:
                 # if we've exhausted the result figure's objects and there's still something here
                 objectMap[name0] = -1
+                if not invObjectMap[-1] == []:
+                    invObjectMap[-1] = []
+                invObjectMap[-1].append(name0)
                 continue
             set0 = set(obj0.attributes.items())
             minDiff = None
-            minDiffIndex = -1
+            minDiffScore = -1
             bestPairedName = None
             for name1, obj1 in fig1.items():
                 set1 = set(obj1.attributes.items())
                 differences = (set1 - set0) # differences between each object within the 2 figures
+                diffScore = scoreDiffs(differences, set0, set1)
 
-                # naive way of calculating diff index
-                numD = len(differences)
-                diffIndex = (numD * numD) / (len(set0) * len(set1))
-
-                if minDiffIndex == -1 or diffIndex < minDiffIndex: # if we find an object pairing with few diffs update our objectMap
+                # update best diff score if applicable
+                if diffScore < minDiffScore or minDiffScore == -1: # if we find an object pairing with few diffs update our objectMap
                     minDiff = differences
-                    minDiffIndex = diffIndex
+                    minDiffScore = diffScore
                     bestPairedName = name1
 
             objectMap[name0] = bestPairedName
+            invObjectMap[bestPairedName] = name0
             del fig1[bestPairedName]
         # gone through all of the initial figure's objects and there's still items in fig1
         if fig1:
             # have items in fig1
             objectMap[-1] = fig1.keys()
 
-        return objectMap
+            for k in fig.keys():
+                invObjectMap[k] = -1
+
+        return (objectMap, invObjectMap)
     else:
         print('3x3 matrix given')
-        pass
-    return -1
+        return -1
 
-def getTransitions(objectMap, figures):
-    if len(figures) is 2:
-        for src, dst in objectMap.items():
-            srcObj = figures[0][src].attributes
-            dstObj = figures[1][dst].attributes
-            objChanges = dict_diff(srcObj, dstObj)
-            transitions = changeToTransition(objChanges)
-            ipdb.set_trace()
-            # attributes
-    else:
-        print('3x3 matrix given')
-        pass
-    return -1
-
-def extractTransitions(o0):
-    return -1
-
-def changeToTransition(changes):
-    transitions = {}
-    if not changes:
-        return transitions
-    else:
-        if 'shape' in changes:
-            shapeVocab = ['circle', 'triangle', 'rectangle', 'square']
-            transitions['shape'] = changes['shape']
-        elif 'size' in changes:
-            sizesVocab = ['small','medium','large','very large','huge']
-            sizes = changes['size']
-            sizesVocab.index(sizes[1]) - sizesVocab.index(sizes[0])
-
-
-def dict_diff(first, second):
-    """ Return a dict of keys that differ with another config object.  If a value is
-        not found in one fo the configs, it will be represented by KEYNOTFOUND.
-        @param first:   Fist dictionary to diff.
-        @param second:  Second dicationary to diff.
-        @return diff:   Dict of Key => (first.val, second.val)
-    """
-    diff = {}
-    # Check all keys in first dict
-    for key in first:
-        if (not key in second):
-            diff[key] = (first[key], '<KEYNOTFOUND>')
-        elif (first[key] != second[key]):
-            diff[key] = (first[key], second[key])
-    # Check all keys in second dict to find missing
-    for key in second:
-        if (not key in first):
-            diff[key] = ('<KEYNOTFOUND>', second[key])
-    return diff
+def scoreDiffs(differences, set0, set1):
+    # ipdb.set_trace()
+    # TODO: naive way of scoring differences
+    numD = len(differences)
+    return (numD * numD) / (len(set0) * len(set1))
