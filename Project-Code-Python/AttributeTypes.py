@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
-import ipdb
+
+# TODO: make more OOP! have a parent attribute class with common methods/vars
 
 def attrGen(nodeAttrs, attrName, attrVal):
     if attrName == 'shape':
@@ -14,7 +15,7 @@ def attrGen(nodeAttrs, attrName, attrVal):
     elif attrName == 'fill':
         nodeAttrs[attrName] = Fill.convert(attrVal)
     else:
-        print('Unidentifiable Attribute found', attrName, attrVal)
+        raise ValueError('Unidentifiable Attribute found', attrName, attrVal)
 
 # Shape Attribute Wrapper
 class Shape:
@@ -44,6 +45,14 @@ class Shape:
             return Shape(-1, self.props.copy())
         else:
             raise ValueError('Shape Subtraction: Inconsistent Types!', self, other)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 # Size Attribute Wrapper
 class Size:
@@ -76,12 +85,20 @@ class Size:
             return Shape(-1, self.props.copy())
         raise ValueError('Size Subtraction: Inconsistent Types!', self, other)
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 # Angle Attribute
 class Angle:
 
     @staticmethod
     def convert(angle):
-        return Angle(1, {'angle': angle})
+        return Angle(1, {'angle': int(angle)})
 
     def __init__(self, status, props):
         self.status = status
@@ -98,13 +115,21 @@ class Angle:
         elif self.props == other.props:
             return 0
         else:
-            return Angle(0, {'angle': (self.angle - other.angle)})
+            return Angle(0, {'angle': (self.props['angle'] - other.props['angle'])})
 
 
     def __rsub__(self, other):
         if other == 0:
             return Angle(-1, self.props.copy())
         raise ValueError('Angle Subtraction: Inconsistent Types!', self, other)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
 
 class Alignment: # top, bottom
@@ -134,8 +159,22 @@ class Alignment: # top, bottom
         else:
             return Alignment(0, {'vertical': self.props['vertical'] - other.props['vertical'], 'horizontal': self.props['horizontal'] - other.props['horizontal']})
 
+    def __rsub__(self, other):
+        if other == 0:
+            return Alignment(-1, self.props.copy())
+        raise ValueError('Alignment Subtraction: Inconsistent Types!', self, other)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
 class Fill:
-    fill2Num = {'yes': 1, 'no': 0}
+    # 1 = quadrant filled, 0 = quadrant empty, quadrants represented left to right
+    fill2Num = {'yes': (1, 1, 1, 1), 'no': (0, 0, 0, 0), 'right-half': (0, 1, 0, 1), 'left-half': (1, 0, 1, 0), 'top-half': (1, 1, 0 ,0), 'bottom-half': (0, 0, 1, 1)}
 
     @staticmethod
     def convert(fillYN):
@@ -156,5 +195,18 @@ class Fill:
         elif self.props == other.props:
             return 0
         else:
-            return Fill(0, {'fill'})
+            newFill = tuple(np.subtract(self.props['fill'], other.props['fill']))
+            return Fill(0, {'fill': newFill})
 
+    def __rsub__(self, other):
+        if other == 0:
+            return Fill(-1, self.props.copy())
+        raise ValueError('Fill Subtraction: Inconsistent Types!', self, other)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

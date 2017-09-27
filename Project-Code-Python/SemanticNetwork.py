@@ -1,6 +1,5 @@
 from PIL import Image
 import numpy as np
-import ipdb
 import copy
 
 from AttributeTypes import attrGen
@@ -9,7 +8,7 @@ class SemNode:
     objectIDs = 0
 
     @staticmethod
-    def convert(ravObj, alias = None):
+    def convert(objName, objVal, edges, alias = None):
         nID = None
         if alias:
             nID = alias.id
@@ -18,8 +17,11 @@ class SemNode:
             SemNode.objectIDs += 1
 
         nodeAttrs = {}
-        for attrName, attrVal in ravObj.attributes.items():
-            attrGen(nodeAttrs, attrName, attrVal)
+        for attrName, attrVal in objVal.attributes.items():
+            if attrName in SemEdge.edgeTerms:
+                edges.append((objName, attrName, attrVal))
+            else:
+                attrGen(nodeAttrs, attrName, attrVal)
 
         return SemNode(nID, 1, nodeAttrs)
 
@@ -29,19 +31,11 @@ class SemNode:
         self.attributes = attributes
 
     def __sub__(self, other):
-        # self - other
-        # print('subtracting semnodes\n\t', self, 'and\n\t', other)
-        # ipdb.set_trace()
-
         if other == 0:
             return copy.deepcopy(self)
 
-        # if self == 0:
-        #     return SemNode(other.id, other.attributes, -1)
-
         if self.status == other.status:
             # 0 status change
-            print('no status change')
             if self.id != other.id:
                 raise ValueError('Node Subtraction: Incorrect Index!', self, other)
 
@@ -51,8 +45,6 @@ class SemNode:
 
             for attrName in sAttr:
                 if attrName in oAttr:
-                    # print(attrName, 'is in both', sAttr, oAttr)
-                    # Shape Subt, Fill Subt, Size Subt...
                     newAttr[attrName] = sAttr[attrName] - oAttr[attrName]
                 else:
                     newAttr[attrName] = sAttr[attrName]
@@ -68,7 +60,7 @@ class SemNode:
 
     def __rsub__(self, other):
         if other == 0:
-            return SemNode(self.id, self.attributes, -1)
+            return SemNode(self.id, -1, self.attributes)
         else:
             raise ValueError('Node Subtraction: Inconsistent Types!', self, other)
 
@@ -80,17 +72,40 @@ class SemNode:
         return self.__str__()
 
 
-# class SemEdge:
+class SemEdge:
+    edgeTerms = {'inside', 'left-of', 'above', 'overlaps'}
 
-#     def __init__(self, status, relations):
-#         self.status = status
-#         self.relations = relations
+    @staticmethod
+    def generate(edgeType):
+        return SemEdge(1, set([edgeType]))
 
-#     def __sub__(self, other):
-#         if other.relationType == self.relationType:
-#             return SemEdge(self.status - other.status, [self.relations[key] - other.relations[key] for key in self.relations]
-#         else:
-#             return SemEdge(2, '<typeChange>', [other.relationType, self.relationType])
+    def __init__(self, status, attributes):
+        self.status = status
+        self.attributes = attributes
+
+    def __sub__(self, other):
+        if other == 0:
+            return SemEdge(self.status, self.attributes.copy())
+
+        newStatus = self.status - other.status
+
+        if newStatus:
+            return SemEdge(newStatus, self.attributes.copy())
+        elif self.attributes == other.attributes:
+            return 0
+        elif isinstance(other, SemEdge):
+            return SemEdge(0, self.attributes - other.attributes)
+        else:
+            return None
+
+    def __rsub__(self, other):
+        if other == 0:
+            return SemEdge(-1, self.attributes.copy())
+        else:
+            raise ValueError('Edge Subtraction: Inconsistent Types!', self, other)
+
+    def addEdge(self, edgeType):
+        self.attributes.add(edgeType)
 
 class SemNet:
 
@@ -99,35 +114,70 @@ class SemNet:
         adjMat = np.zeros((dim, dim), dtype=object)
 
         # print('got omap')
+        edges = []
+
         for objName, objVal in ravenFigure.objects.items():
 
             n = None
             if dualOMaps:
                 aliasName = dualOMaps[1][objName]
-                n = SemNode.convert(objVal, allNodes[aliasName])
+                n = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
             else:
-                n = SemNode.convert(objVal)
+                n = SemNode.convert(objName, objVal, edges)
             allNodes[objName]= n
-            adjMat[n.id][n.id] = n
-        return SemNet(adjMat)
+            try:
+                adjMat[n.id][n.id] = n
+            except IndexError:
+                # TODO: remove this patch and implement better object matching
+                return None
 
-    def __init__(self, adjMat = 0):
+
+
+        # have all nodes in Semnet now
+        # have all internalLinks, so place edges now accordingly
+        if edges:
+            # print('edges with internal links!')
+            for node0, edge, nodes1 in edges:
+                nodes1 = nodes1.split(',')
+                for node1 in nodes1:
+                    row = allNodes[node0].id
+                    col = allNodes[node1].id
+
+                    if adjMat[row][col] and isinstance(adjMat[row][col], SemEdge):
+                        # some edge already exists, so append
+                        adjMat[row][col].addEdge(edge)
+                    else:
+                        # new edge
+                        adjMat[row][col] = SemEdge.generate(edge)
+
+                # print(node0, edge, node1)
+
+        return SemNet(len(ravenFigure.objects), adjMat)
+
+    def __init__(self, status, adjMat = 0):
         # print('creating semnet', type(adjMat))
+        self.status = status
         self.adjMat = adjMat
 
     def __sub__(self, other):
+        if other and isinstance(other, SemNet):
+            return SemNet(self.status - other.status, self.adjMat - other.adjMat)
+        else:
+            return None
+
         # print('subtacting two sem nets', type(self.adjMat), type(other.adjMat))
-        return SemNet(self.adjMat - other.adjMat)
 
     def __rsub__(self, other):
-        return other - self
+        if other and isinstance(other, SemNet):
+            return other - self
+        else:
+            return None
 
     def __str__(self):
         return str(self.adjMat)
 
     def __repr__(self):
         return self.__str__()
-
 
 
 
