@@ -490,14 +490,15 @@
 		<span style="overflow: hidden; display: inline-block; margin: 0.00px 0.00px; border: 0.00px solid #000000; transform: rotate(0.00rad) translateZ(0px); -webkit-transform: rotate(0.00rad) translateZ(0px); width: 719.00px; height: 206.00px;">
 			<img alt="Blank Diagram - Page 1.png" src="images/image5.png" style="width: 832.39px; height: 645.23px; margin-left: -14.67px; margin-top: -82.00px; transform: rotate(0.00rad) translateZ(0px); -webkit-transform: rotate(0.00rad) translateZ(0px);" title="">
 		</span>
-	</h3>
-	<h1 class="c28" id="h.56f44x7edjwz">
 		<span style="overflow: hidden; display: inline-block; margin: 0.00px 0.00px; border: 0.00px solid #000000; transform: rotate(0.00rad) translateZ(0px); -webkit-transform: rotate(0.00rad) translateZ(0px); width: 536.70px; height: 326.50px;">
 			<img alt="" src="images/image4.png" style="width: 536.70px; height: 326.50px; margin-left: 0.00px; margin-top: 0.00px; transform: rotate(0.00rad) translateZ(0px); -webkit-transform: rotate(0.00rad) translateZ(0px);" title="">
 		</span>
-	</h1>
-	<h1 class="c12" id="h.43z6dez6t33">
+	<!-- </h3>
+	<h1 class="c28" id="h.56f44x7edjwz">
+	</h1> -->
+	<!-- <h1 class="c12" id="h.43z6dez6t33">
 		<span class="c16">
+            Test
 		</span>
 	</h1>
 	<h1 class="c12" id="h.vnajno2sd0ji">
@@ -523,7 +524,7 @@
 	<h1 class="c12" id="h.p56iq18pumg2">
 		<span class="c16">
 		</span>
-	</h1>
+	</h1> -->
 	<h1 class="c28" id="h.efoauag8drd5">
 		<span class="c16">
 		Weaknesses</span>
