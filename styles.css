@@ -1,227 +1,227 @@
 @import url('https://themes.googleusercontent.com/fonts/css?kit=3qINvnjb346LubKDfLRn69t6G6Z1RrRfgULZ1AHo7mPOfsfM6rvuuu7h1pY3r_-A');
 .lst-kix_bzi60k1pundr-4>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-4, lower-latin) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-4, lower-latin) ". ";
 }
 .lst-kix_bzi60k1pundr-4>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-4
+    counter-increment: lst-ctn-kix_bzi60k1pundr-4;
 }
 ol.lst-kix_bzi60k1pundr-6.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-6 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-6 0;
 }
 ol.lst-kix_ge7qo3u2btfs-7.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-7 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-7 0;
 }
 .lst-kix_bzi60k1pundr-1>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-1, lower-latin) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-1, lower-latin) ". ";
 }
 .lst-kix_bzi60k1pundr-5>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-5, lower-roman) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-5, lower-roman) ". ";
 }
 ol.lst-kix_ge7qo3u2btfs-0.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-0 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-0 0;
 }
 ol.lst-kix_bzi60k1pundr-1 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_bzi60k1pundr-2 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_bzi60k1pundr-3 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_bzi60k1pundr-4 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_bzi60k1pundr-2>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-2, lower-roman) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-2, lower-roman) ". ";
 }
 ol.lst-kix_bzi60k1pundr-5 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_bzi60k1pundr-6 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_ge7qo3u2btfs-3>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-3
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-3;
 }
 .lst-kix_bzi60k1pundr-3>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-3, decimal) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-3, decimal) ". ";
 }
 ol.lst-kix_bzi60k1pundr-7 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_bzi60k1pundr-8 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_bzi60k1pundr-2.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-2 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-2 0;
 }
 ol.lst-kix_ge7qo3u2btfs-4.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-4 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-4 0;
 }
 .lst-kix_ge7qo3u2btfs-4>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-4
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-4;
 }
 .lst-kix_bzi60k1pundr-0>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-0, decimal) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-0, decimal) ". ";
 }
 ol.lst-kix_bzi60k1pundr-0.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-0 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-0 0;
 }
 .lst-kix_ge7qo3u2btfs-0>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-0, decimal) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-0, decimal) ". ";
 }
 ol.lst-kix_ge7qo3u2btfs-6.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-6 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-6 0;
 }
 ol.lst-kix_bzi60k1pundr-7.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-7 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-7 0;
 }
 .lst-kix_ge7qo3u2btfs-1>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-1, lower-latin) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-1, lower-latin) ". ";
 }
 .lst-kix_ge7qo3u2btfs-2>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-2, lower-roman) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-2, lower-roman) ". ";
 }
 ol.lst-kix_bzi60k1pundr-3.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-3 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-3 0;
 }
 .lst-kix_ge7qo3u2btfs-7>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-7, lower-latin) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-7, lower-latin) ". ";
 }
 .lst-kix_ge7qo3u2btfs-6>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-6, decimal) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-6, decimal) ". ";
 }
 .lst-kix_ge7qo3u2btfs-5>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-5, lower-roman) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-5, lower-roman) ". ";
 }
 ol.lst-kix_bzi60k1pundr-0 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_ge7qo3u2btfs-3>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-3, decimal) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-3, decimal) ". ";
 }
 .lst-kix_ge7qo3u2btfs-4>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-4, lower-latin) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-4, lower-latin) ". ";
 }
 ol.lst-kix_ge7qo3u2btfs-3.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-3 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-3 0;
 }
 .lst-kix_bzi60k1pundr-1>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-1
+    counter-increment: lst-ctn-kix_bzi60k1pundr-1;
 }
 .lst-kix_bzi60k1pundr-7>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-7
+    counter-increment: lst-ctn-kix_bzi60k1pundr-7;
 }
 ol.lst-kix_ge7qo3u2btfs-2.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-2 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-2 0;
 }
 ol.lst-kix_ge7qo3u2btfs-5.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-5 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-5 0;
 }
 .lst-kix_ge7qo3u2btfs-6>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-6
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-6;
 }
 .lst-kix_ge7qo3u2btfs-1>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-1
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-1;
 }
 ol.lst-kix_bzi60k1pundr-1.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-1 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-1 0;
 }
 .lst-kix_ge7qo3u2btfs-8>li:before {
-    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-8, lower-roman) ". "
+    content: "" counter(lst-ctn-kix_ge7qo3u2btfs-8, lower-roman) ". ";
 }
 .lst-kix_bzi60k1pundr-2>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-2
+    counter-increment: lst-ctn-kix_bzi60k1pundr-2;
 }
 .lst-kix_bzi60k1pundr-6>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-6
+    counter-increment: lst-ctn-kix_bzi60k1pundr-6;
 }
 .lst-kix_ge7qo3u2btfs-0>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-0
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-0;
 }
 ol.lst-kix_bzi60k1pundr-4.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-4 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-4 0;
 }
 .lst-kix_ge7qo3u2btfs-7>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-7
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-7;
 }
 ol.lst-kix_ge7qo3u2btfs-1 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_ge7qo3u2btfs-2>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-2
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-2;
 }
 ol.lst-kix_ge7qo3u2btfs-2 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_ge7qo3u2btfs-5>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-5
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-5;
 }
 ol.lst-kix_ge7qo3u2btfs-0 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_ge7qo3u2btfs-5 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_ge7qo3u2btfs-6 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_ge7qo3u2btfs-8>li {
-    counter-increment: lst-ctn-kix_ge7qo3u2btfs-8
+    counter-increment: lst-ctn-kix_ge7qo3u2btfs-8;
 }
 ol.lst-kix_ge7qo3u2btfs-3 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_ge7qo3u2btfs-4 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_bzi60k1pundr-8>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-8
+    counter-increment: lst-ctn-kix_bzi60k1pundr-8;
 }
 .lst-kix_bzi60k1pundr-3>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-3
+    counter-increment: lst-ctn-kix_bzi60k1pundr-3;
 }
 ol.lst-kix_bzi60k1pundr-5.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-5 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-5 0;
 }
 .lst-kix_bzi60k1pundr-5>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-5
+    counter-increment: lst-ctn-kix_bzi60k1pundr-5;
 }
 ol.lst-kix_ge7qo3u2btfs-7 {
-    list-style-type: none
+    list-style-type: none;
 }
 ol.lst-kix_ge7qo3u2btfs-8 {
-    list-style-type: none
+    list-style-type: none;
 }
 .lst-kix_bzi60k1pundr-0>li {
-    counter-increment: lst-ctn-kix_bzi60k1pundr-0
+    counter-increment: lst-ctn-kix_bzi60k1pundr-0;
 }
 ol.lst-kix_ge7qo3u2btfs-1.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-1 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-1 0;
 }
 .lst-kix_bzi60k1pundr-8>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-8, lower-roman) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-8, lower-roman) ". ";
 }
 ol.lst-kix_ge7qo3u2btfs-8.start {
-    counter-reset: lst-ctn-kix_ge7qo3u2btfs-8 0
+    counter-reset: lst-ctn-kix_ge7qo3u2btfs-8 0;
 }
 .lst-kix_bzi60k1pundr-6>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-6, decimal) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-6, decimal) ". ";
 }
 .lst-kix_bzi60k1pundr-7>li:before {
-    content: "" counter(lst-ctn-kix_bzi60k1pundr-7, lower-latin) ". "
+    content: "" counter(lst-ctn-kix_bzi60k1pundr-7, lower-latin) ". ";
 }
 ol.lst-kix_bzi60k1pundr-8.start {
-    counter-reset: lst-ctn-kix_bzi60k1pundr-8 0
+    counter-reset: lst-ctn-kix_bzi60k1pundr-8 0;
 }
 ol {
     margin: 0;
-    padding: 0
+    padding: 0;
 }
 table td,
 table th {
-    padding: 0
+    padding: 0;
 }
 .c29 {
     border-right-style: solid;
@@ -239,7 +239,7 @@ table th {
     border-bottom-width: 1.5pt;
     width: 234pt;
     border-top-color: #ffffff;
-    border-bottom-style: solid
+    border-bottom-style: solid;
 }
 .c19 {
     border-right-style: solid;
@@ -257,7 +257,7 @@ table th {
     border-bottom-width: 1.5pt;
     width: 234pt;
     border-top-color: #ffffff;
-    border-bottom-style: solid
+    border-bottom-style: solid;
 }
 .c7 {
     border-right-style: solid;
@@ -274,7 +274,7 @@ table th {
     border-bottom-width: 1pt;
     width: 54pt;
     border-top-color: #000000;
-    border-bottom-style: solid
+    border-bottom-style: solid;
 }
 .c1 {
     border-right-style: solid;
@@ -291,7 +291,7 @@ table th {
     border-bottom-width: 1pt;
     width: 39pt;
     border-top-color: #000000;
-    border-bottom-style: solid
+    border-bottom-style: solid;
 }
 .c6 {
     color: #000000;
@@ -300,7 +300,7 @@ table th {
     vertical-align: baseline;
     font-size: 14pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c4 {
     color: #000000;
@@ -309,7 +309,7 @@ table th {
     vertical-align: baseline;
     font-size: 10pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c26 {
     color: #0b5394;
@@ -318,7 +318,7 @@ table th {
     vertical-align: baseline;
     font-size: 14pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c2 {
     color: #000000;
@@ -327,7 +327,7 @@ table th {
     vertical-align: baseline;
     font-size: 11pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c41 {
     color: #000000;
@@ -336,7 +336,7 @@ table th {
     vertical-align: baseline;
     font-size: 36pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c38 {
     color: #008a05;
@@ -345,7 +345,7 @@ table th {
     vertical-align: baseline;
     font-size: 12pt;
     font-family: "Proxima Nova";
-    font-style: italic
+    font-style: italic;
 }
 .c16 {
     color: #039be5;
@@ -354,7 +354,7 @@ table th {
     vertical-align: baseline;
     font-size: 18pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c24 {
     color: #000000;
@@ -363,7 +363,7 @@ table th {
     vertical-align: baseline;
     font-size: 14pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c37 {
     color: #000000;
@@ -372,7 +372,7 @@ table th {
     vertical-align: baseline;
     font-size: 18pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c3 {
     color: #38761d;
@@ -381,7 +381,7 @@ table th {
     vertical-align: baseline;
     font-size: 14pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c33 {
     color: #039be5;
@@ -390,7 +390,7 @@ table th {
     vertical-align: baseline;
     font-size: 18pt;
     font-family: "Proxima Nova";
-    font-style: italic
+    font-style: italic;
 }
 .c23 {
     font-weight: 400;
@@ -398,7 +398,7 @@ table th {
     vertical-align: baseline;
     font-size: 11pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c27 {
     color: #ff0000;
@@ -406,7 +406,7 @@ table th {
     text-decoration: none;
     font-size: 14pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c5 {
     padding-top: 10pt;
@@ -414,7 +414,7 @@ table th {
     line-height: 1.25;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 .c40 {
     font-weight: 400;
@@ -422,7 +422,7 @@ table th {
     vertical-align: baseline;
     font-size: 10pt;
     font-family: "Proxima Nova";
-    font-style: normal
+    font-style: normal;
 }
 .c31 {
     padding-top: 10pt;
@@ -430,7 +430,7 @@ table th {
     line-height: 1.25;
     orphans: 2;
     widows: 2;
-    text-align: right
+    text-align: right;
 }
 .c30 {
     padding-top: 32pt;
@@ -438,7 +438,7 @@ table th {
     line-height: 1.25;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 .c12 {
     padding-top: 24pt;
@@ -446,7 +446,7 @@ table th {
     line-height: 1.25;
     page-break-after: avoid;
     text-align: left;
-    height: 18pt
+    height: 18pt;
 }
 .c35 {
     padding-top: 10pt;
@@ -454,123 +454,123 @@ table th {
     line-height: 1.0;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 .c28 {
     padding-top: 24pt;
     padding-bottom: 0pt;
     line-height: 1.25;
     page-break-after: avoid;
-    text-align: left
+    text-align: left;
 }
 .c9 {
     padding-top: 0pt;
     padding-bottom: 0pt;
     line-height: 1.15;
     page-break-after: avoid;
-    text-align: left
+    text-align: left;
 }
 .c8 {
     padding-top: 10pt;
     padding-bottom: 0pt;
     line-height: 1.25;
     page-break-after: avoid;
-    text-align: left
+    text-align: left;
 }
 .c43 {
     padding-top: 72pt;
     padding-bottom: 0pt;
     line-height: 1.0;
     page-break-after: avoid;
-    text-align: left
+    text-align: left;
 }
 .c44 {
     margin-left: auto;
     border-spacing: 0;
     border-collapse: collapse;
-    margin-right: auto
+    margin-right: auto;
 }
 .c17 {
     border-spacing: 0;
     border-collapse: collapse;
-    margin-right: auto
+    margin-right: auto;
 }
 .c11 {
     font-size: 48pt;
     font-family: "Proxima Nova";
     color: #404040;
-    font-weight: 700
+    font-weight: 700;
 }
 .c0 {
     padding-top: 0pt;
     padding-bottom: 0pt;
     line-height: 1.0;
-    text-align: left
+    text-align: left;
 }
 .c45 {
     font-weight: 400;
     font-size: 16pt;
-    font-family: "Proxima Nova"
+    font-family: "Proxima Nova";
 }
 .c15 {
     font-size: 14pt;
     color: #38761d;
-    font-weight: 700
+    font-weight: 700;
 }
 .c21 {
     font-size: 36pt;
     color: #039be5;
-    font-weight: 400
+    font-weight: 400;
 }
 .c20 {
     font-size: 14pt;
     color: #0b5394;
-    font-weight: 700
+    font-weight: 700;
 }
 .c42 {
     text-decoration: none;
     vertical-align: baseline;
-    font-style: normal
+    font-style: normal;
 }
 .c14 {
     background-color: #ffffff;
     max-width: 468pt;
-    padding: 72pt 72pt 72pt 72pt
+    padding: 72pt 72pt 72pt 72pt;
 }
 .c10 {
     font-size: 14pt;
     color: #ff0000;
-    font-weight: 700
+    font-weight: 700;
 }
 .c36 {
     margin-left: 36pt;
-    padding-left: 0pt
+    padding-left: 0pt;
 }
 .c34 {
     padding: 0;
-    margin: 0
+    margin: 0;
 }
 .c39 {
     font-size: 14pt;
-    font-weight: 700
+    font-weight: 700;
 }
 .c32 {
-    color: #ed0800
+    color: #ed0800;
 }
 .c13 {
-    vertical-align: sub
+    vertical-align: sub;
 }
 .c46 {
-    font-size: 16pt
+    font-size: 16pt;
 }
 .c22 {
-    height: 11pt
+    height: 11pt;
 }
 .c18 {
-    color: #666666
+    color: #666666;
 }
 .c25 {
-    height: 0pt
+    height: 0pt;
 }
 .title {
     padding-top: 72pt;
@@ -583,7 +583,7 @@ table th {
     page-break-after: avoid;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 .subtitle {
     padding-top: 10pt;
@@ -595,18 +595,18 @@ table th {
     page-break-after: avoid;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 li {
     color: #000000;
     font-size: 11pt;
-    font-family: "Proxima Nova"
+    font-family: "Proxima Nova";
 }
 p {
     margin: 0;
     color: #000000;
     font-size: 11pt;
-    font-family: "Proxima Nova"
+    font-family: "Proxima Nova";
 }
 h1 {
     padding-top: 24pt;
@@ -618,7 +618,7 @@ h1 {
     page-break-after: avoid;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 h2 {
     padding-top: 10pt;
@@ -630,7 +630,7 @@ h2 {
     page-break-after: avoid;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 h3 {
     padding-top: 10pt;
@@ -643,7 +643,7 @@ h3 {
     font-style: italic;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 h4 {
     padding-top: 8pt;
@@ -656,7 +656,7 @@ h4 {
     page-break-after: avoid;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 h5 {
     padding-top: 8pt;
@@ -668,7 +668,7 @@ h5 {
     page-break-after: avoid;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
 h6 {
     padding-top: 8pt;
@@ -681,5 +681,5 @@ h6 {
     font-style: italic;
     orphans: 2;
     widows: 2;
-    text-align: left
+    text-align: left;
 }
