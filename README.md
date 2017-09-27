@@ -21,7 +21,7 @@
 			</span>
 		</p>
 	</div>
-	<p class="c43 title" id="h.vk178u7nusev">
+	<h1 class="c43 title" id="h.vk178u7nusev">
 		<span class="c21">
 		Project 1</span>
 		<span class="c11">
@@ -29,7 +29,7 @@
 		</span>
 		<span>
 		Solving 2x2 RPM using Verbal and/or Visual Representations</span>
-	</p>
+	</h1>
 	<p class="c35">
 		<span style="overflow: hidden; display: inline-block; margin: 0.00px 0.00px; border: 0.00px solid #000000; transform: rotate(0.00rad) translateZ(0px); -webkit-transform: rotate(0.00rad) translateZ(0px); width: 47.00px; height: 6.00px;">
 			<img alt="" src="images/image6.png" style="width: 47.00px; height: 6.00px; margin-left: 0.00px; margin-top: 0.00px; transform: rotate(0.00rad) translateZ(0px); -webkit-transform: rotate(0.00rad) translateZ(0px);" title="short line">
