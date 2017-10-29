@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import copy
+import ipdb
 
 from AttributeTypes import attrGen
 
@@ -65,7 +66,7 @@ class SemNode:
             raise ValueError('Node Subtraction: Inconsistent Types!', self, other)
 
     def __str__(self):
-        return '(id{0}, st{1}) - {2}'.format(self.id, self.status, self.attributes)
+        return '\n\tID: {0}, ST: {1}, ATRS: {2}\n'.format(self.id, self.status, self.attributes)
         # return 'id:', str(self.id),'status:',str(self.status), 'attr:',str(self.attributes)
 
     def __repr__(self):
@@ -107,10 +108,16 @@ class SemEdge:
     def addEdge(self, edgeType):
         self.attributes.add(edgeType)
 
+    def __str__(self):
+        return '{0}~{1}'.format(self.status, self.attributes)
+
+    def __repr__(self):
+        return self.__str__()
+
 class SemNet:
 
     @staticmethod
-    def generate(ravenFigure, dim, allNodes, dualOMaps):
+    def generate(ravenFigure, dim, allNodes, aliasPair):
         adjMat = np.zeros((dim, dim), dtype=object)
 
         # print('got omap')
@@ -119,8 +126,8 @@ class SemNet:
         for objName, objVal in ravenFigure.objects.items():
 
             n = None
-            if dualOMaps:
-                aliasName = dualOMaps[1][objName]
+            if aliasPair:
+                aliasName = aliasPair[objName]
                 n = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
             else:
                 n = SemNode.convert(objName, objVal, edges)
@@ -128,10 +135,10 @@ class SemNet:
             try:
                 adjMat[n.id][n.id] = n
             except IndexError:
+                print('\tNONE SEMNET GENERATED FOR ' + ravenFigure.name)
+                # ipdb.set_trace()
                 # TODO: remove this patch and implement better object matching
                 return None
-
-
 
         # have all nodes in Semnet now
         # have all internalLinks, so place edges now accordingly
@@ -174,7 +181,7 @@ class SemNet:
             return None
 
     def __str__(self):
-        return str(self.adjMat)
+        return '\n\t{0}\n'.format(str(self.adjMat))
 
     def __repr__(self):
         return self.__str__()
