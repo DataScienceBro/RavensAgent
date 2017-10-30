@@ -201,10 +201,12 @@ def evaluateSemDiffs(problem, Nets, ansScores):
 def computeSemNets(problem, aliasPairRef, maxObjs, netParams):
     Nets = {}
     allNodes = {-1: None}
+    globalIDs = {}
 
     for netName, objPair in netParams:
         aliasPair = aliasPairRef[objPair] if objPair else None
-        Nets[netName] = SemNet.generate(problem.figures[netName], maxObjs, allNodes, aliasPair)
+        aliasPair = aliasPairRef[objPair] if objPair else None
+        Nets[netName] = SemNet.generate(problem.figures[netName], maxObjs, allNodes, globalIDs, aliasPair)
 
     if problem.name == 'Basic Problem C-03':
         ipdb.set_trace()

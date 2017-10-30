@@ -5,6 +5,100 @@ import ipdb
 
 from AttributeTypes import attrGen
 
+class SemNet:
+
+    @staticmethod
+    def generate(ravenFigure, dim, allNodes, globalIDs, aliasPair):
+        adjMat = np.zeros((dim, dim), dtype=object)
+
+        # print('got omap')
+        edges = []
+        locallyUsedIDs = set()
+
+        for objName, objVal in ravenFigure.objects.items():
+
+            node = None
+            if aliasPair and aliasPair[objName] != -1:
+                aliasName = aliasPair[objName]
+                # print('using alias: {0}'.format(aliasName))
+                node = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
+            else:
+
+                if SemNode.objectIDs < dim:
+                    # if generating another id category still leaves room for one more
+                    node = SemNode.convert(objName, objVal, edges)
+                else:
+                    print('manually choosing alias for {0}\'s {1}'.format(ravenFigure.name, objName))
+                    # go through all current objectIDs and choose best among unused categories
+                    ipdb.set_trace()
+                    for i in range(0, SemNode.objectIDs):
+                        if (not i in locallyUsedIDs):
+                            print('could use {0}'.format(globalIDs[i]))
+
+
+                    # choose best
+            try:
+                adjMat[node.id][node.id] = node
+                allNodes[objName]= node
+                locallyUsedIDs.add(node.id)
+                if not node.id in globalIDs:
+                    globalIDs[node.id] = []
+                globalIDs[node.id].append(objName)
+            except IndexError:
+                # go through all unused indicies
+
+                print('\tNONE SEMNET GENERATED FOR ' + ravenFigure.name)
+                ipdb.set_trace()
+                # TODO: remove this patch and implement better object matching
+                return None
+
+        # have all nodes in Semnet now
+        # have all internalLinks, so place edges now accordingly
+        if edges:
+            # print('edges with internal links!')
+            for node0, edge, nodes1 in edges:
+                nodes1 = nodes1.split(',')
+                for node1 in nodes1:
+                    row = allNodes[node0].id
+                    col = allNodes[node1].id
+
+                    if adjMat[row][col] and isinstance(adjMat[row][col], SemEdge):
+                        # some edge already exists, so append
+                        adjMat[row][col].addEdge(edge)
+                    else:
+                        # new edge
+                        adjMat[row][col] = SemEdge.generate(edge)
+
+                # print(node0, edge, node1)
+
+        return SemNet(len(ravenFigure.objects), adjMat)
+
+    def __init__(self, status, adjMat = 0):
+        # print('creating semnet', type(adjMat))
+        self.status = status
+        self.adjMat = adjMat
+
+    def __sub__(self, other):
+        if other and isinstance(other, SemNet):
+            return SemNet(self.status - other.status, self.adjMat - other.adjMat)
+        else:
+            return None
+
+        # print('subtacting two sem nets', type(self.adjMat), type(other.adjMat))
+
+    def __rsub__(self, other):
+        if other and isinstance(other, SemNet):
+            return other - self
+        else:
+            return None
+
+    def __str__(self):
+        return '\n\t{0}\n'.format(str(self.adjMat))
+
+    def __repr__(self):
+        return self.__str__()
+
+
 class SemNode:
     objectIDs = 0
 
@@ -14,7 +108,9 @@ class SemNode:
         if alias:
             nID = alias.id
         else:
+            # use the current id and then increment it for the next node to use if necessary
             nID = SemNode.objectIDs
+            print('{0} is a new object: {1}'.format(objName, SemNode.objectIDs))
             SemNode.objectIDs += 1
 
         nodeAttrs = {}
@@ -113,79 +209,6 @@ class SemEdge:
 
     def __repr__(self):
         return self.__str__()
-
-class SemNet:
-
-    @staticmethod
-    def generate(ravenFigure, dim, allNodes, aliasPair):
-        adjMat = np.zeros((dim, dim), dtype=object)
-
-        # print('got omap')
-        edges = []
-
-        for objName, objVal in ravenFigure.objects.items():
-
-            n = None
-            if aliasPair:
-                aliasName = aliasPair[objName]
-                n = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
-            else:
-                n = SemNode.convert(objName, objVal, edges)
-            allNodes[objName]= n
-            try:
-                adjMat[n.id][n.id] = n
-            except IndexError:
-                print('\tNONE SEMNET GENERATED FOR ' + ravenFigure.name)
-                # ipdb.set_trace()
-                # TODO: remove this patch and implement better object matching
-                return None
-
-        # have all nodes in Semnet now
-        # have all internalLinks, so place edges now accordingly
-        if edges:
-            # print('edges with internal links!')
-            for node0, edge, nodes1 in edges:
-                nodes1 = nodes1.split(',')
-                for node1 in nodes1:
-                    row = allNodes[node0].id
-                    col = allNodes[node1].id
-
-                    if adjMat[row][col] and isinstance(adjMat[row][col], SemEdge):
-                        # some edge already exists, so append
-                        adjMat[row][col].addEdge(edge)
-                    else:
-                        # new edge
-                        adjMat[row][col] = SemEdge.generate(edge)
-
-                # print(node0, edge, node1)
-
-        return SemNet(len(ravenFigure.objects), adjMat)
-
-    def __init__(self, status, adjMat = 0):
-        # print('creating semnet', type(adjMat))
-        self.status = status
-        self.adjMat = adjMat
-
-    def __sub__(self, other):
-        if other and isinstance(other, SemNet):
-            return SemNet(self.status - other.status, self.adjMat - other.adjMat)
-        else:
-            return None
-
-        # print('subtacting two sem nets', type(self.adjMat), type(other.adjMat))
-
-    def __rsub__(self, other):
-        if other and isinstance(other, SemNet):
-            return other - self
-        else:
-            return None
-
-    def __str__(self):
-        return '\n\t{0}\n'.format(str(self.adjMat))
-
-    def __repr__(self):
-        return self.__str__()
-
 
 
 
