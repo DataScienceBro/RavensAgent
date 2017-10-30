@@ -4,6 +4,7 @@ import copy
 import ipdb
 
 from AttributeTypes import vocab, weights
+from SemanticNetwork import SemEdge
 
 def matchObjectFeatures(fMatA, fMatB):
     if (len(fMatA[1]) == 0 and len(fMatB[1]) == 0):
@@ -143,7 +144,7 @@ def vectorize(attr):
 
 def matchObjects(problem, rel, fMats):
 
-    debug = problem.name == 'Basic Problem B-12'
+    # debug = problem.name == 'Basic Problem B-12'
     debug = False
 
     aliasPairRef = {}
@@ -192,10 +193,11 @@ def extractAliasPairing(figures, debug):
 
         minDiffScore = None
         bestPairedName = None
+        o0attrs = obj0.attributes
+
         for name1, obj1 in fig1.items():
             diffScore = 0
 
-            o0attrs = obj0.attributes
             o1attrs = obj1.attributes
 
             for attr0 in o0attrs:
@@ -203,6 +205,8 @@ def extractAliasPairing(figures, debug):
                     diffScore -= 1.25
                     if o0attrs[attr0] == o1attrs[attr0]:
                         diffScore -= 2
+                    # elif attr0 in SemEdge.edgeTerms:
+                    #     diffScore -= 2 if len(o0attrs[attr0]) == len(o1attrs[attr0]) else 0
                 else:
                     diffScore += 0.5
             for attr1 in o1attrs:

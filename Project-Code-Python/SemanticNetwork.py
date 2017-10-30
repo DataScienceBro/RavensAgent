@@ -8,7 +8,8 @@ from AttributeTypes import attrGen
 class SemNet:
 
     @staticmethod
-    def generate(ravenFigure, dim, allNodes, globalIDs, aliasPair):
+    def generate(problem, netName, dim, allNodes, globalIDs, aliasPair):
+        ravenFigure = problem.figures[netName]
         adjMat = np.zeros((dim, dim), dtype=object)
 
         # print('got omap')
@@ -18,39 +19,30 @@ class SemNet:
         for objName, objVal in ravenFigure.objects.items():
 
             node = None
+            # if we can alias this node automatically
             if aliasPair and aliasPair[objName] != -1:
                 aliasName = aliasPair[objName]
                 # print('using alias: {0}'.format(aliasName))
                 node = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
+
+            # if generating another id category still leaves room for one more
+            elif SemNode.objectIDs < dim:
+                node = SemNode.convert(objName, objVal, edges)
+
+            # manually choosing alias
             else:
+                aliasName = manualCandidateMatch(problem, locallyUsedIDs, globalIDs, objVal)
+                node = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
 
-                if SemNode.objectIDs < dim:
-                    # if generating another id category still leaves room for one more
-                    node = SemNode.convert(objName, objVal, edges)
-                else:
-                    print('manually choosing alias for {0}\'s {1}'.format(ravenFigure.name, objName))
-                    # go through all current objectIDs and choose best among unused categories
-                    ipdb.set_trace()
-                    for i in range(0, SemNode.objectIDs):
-                        if (not i in locallyUsedIDs):
-                            print('could use {0}'.format(globalIDs[i]))
+            # add the node into the Semantic network, allNodes libary, locallyUsedIDS, globalIDs libary
+            adjMat[node.id][node.id] = node
+            allNodes[objName]= node
+            locallyUsedIDs.add(node.id)
 
+            if not node.id in globalIDs:
+                globalIDs[node.id] = []
+            globalIDs[node.id].append(objName)
 
-                    # choose best
-            try:
-                adjMat[node.id][node.id] = node
-                allNodes[objName]= node
-                locallyUsedIDs.add(node.id)
-                if not node.id in globalIDs:
-                    globalIDs[node.id] = []
-                globalIDs[node.id].append(objName)
-            except IndexError:
-                # go through all unused indicies
-
-                print('\tNONE SEMNET GENERATED FOR ' + ravenFigure.name)
-                ipdb.set_trace()
-                # TODO: remove this patch and implement better object matching
-                return None
 
         # have all nodes in Semnet now
         # have all internalLinks, so place edges now accordingly
@@ -110,7 +102,7 @@ class SemNode:
         else:
             # use the current id and then increment it for the next node to use if necessary
             nID = SemNode.objectIDs
-            print('{0} is a new object: {1}'.format(objName, SemNode.objectIDs))
+            # print('{0} is a new object: {1}'.format(objName, SemNode.objectIDs))
             SemNode.objectIDs += 1
 
         nodeAttrs = {}
@@ -212,7 +204,49 @@ class SemEdge:
 
 
 
+def manualCandidateMatch(problem, locallyUsedIDs, globalIDs, objVal):
+    # go through all current objectIDs and choose best among unused categories
+    candidates = {}
+    for i in range(0, SemNode.objectIDs):
+        if (not i in locallyUsedIDs):
+            # candidates += globalIDs[i]
+            for c in globalIDs[i]:
+                candidates[c] = None
 
+    # get all the object attributes from original problem for easy comparison
+    # TODO: 4 lines of bad redundant work, fix this later
+    for figName2, figObj2 in problem.figures.items():
+        # print('Scanning {0}'.format(figName2))
+        for objName2, objVal2 in figObj2.objects.items():
+            if objName2 in candidates:
+                candidates[objName2] = objVal2.attributes
+
+    # print('could use {0}'.format(candidates))
+    o0attrs = objVal.attributes
+
+
+    minDiffScore = None
+    bestPairedName = None
+    for name1, o1attrs in candidates.items():
+        diffScore = 0
+
+        for attr0 in o0attrs:
+            if attr0 in o1attrs:
+                diffScore -= 1.25
+                if o0attrs[attr0] == o1attrs[attr0]:
+                    diffScore -= 2
+            else:
+                diffScore += 0.5
+        for attr1 in o1attrs:
+            if not attr1 in o0attrs:
+                diffScore += 0.5
+
+        # update best diff score if applicable
+        if minDiffScore == None or diffScore < minDiffScore: # if we find an object pairing with few diffs update our objectMap
+            minDiffScore = diffScore
+            bestPairedName = name1
+
+    return bestPairedName
 
 
 

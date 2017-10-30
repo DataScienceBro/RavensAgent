@@ -41,10 +41,11 @@ class Agent:
     def Solve(self,problem):
         SemNode.objectIDs = 0
 
+        
+
         # if not problem.problemType == '2x2':
 
         #     # Skip 3x3 problems (not implemented)
-        #     return -1
 
         challenge = problem.name.startswith('Challenge') # no text representation
 
@@ -150,7 +151,7 @@ def visualGenAndTest(problem, rel, ansScores):
 
 def evaluateSemDiffs(problem, Nets, ansScores):
     # ipdb.set_trace()
-    if problem.name == 'Basic Problem C-03':
+    if problem.name == 'Basic Problem C-08':
         ipdb.set_trace()
 
     if problem.problemType == '2x2':
@@ -175,7 +176,7 @@ def evaluateSemDiffs(problem, Nets, ansScores):
                     colDiff = tempNet - Nets['B'] # should equal C - A
                     ansScores[ansKey] += diffCompare(rowDiff, BADiff) + diffCompare(colDiff, CADiff)
     else:
-
+        # TODO: only leverages bottom right 2x2 grid of 3x3 matrix, include all other figs in prediction!
         FEDiff = Nets['F'] - Nets['E']
         HEDiff = Nets['H'] - Nets['E']
 
@@ -204,12 +205,14 @@ def computeSemNets(problem, aliasPairRef, maxObjs, netParams):
     globalIDs = {}
 
     for netName, objPair in netParams:
+        if problem.name == 'Basic Problem C-08' and netName=='F':
+            ipdb.set_trace()
+        # aliasPair = aliasPairRef[objPair] if objPair else None
         aliasPair = aliasPairRef[objPair] if objPair else None
-        aliasPair = aliasPairRef[objPair] if objPair else None
-        Nets[netName] = SemNet.generate(problem.figures[netName], maxObjs, allNodes, globalIDs, aliasPair)
+        Nets[netName] = SemNet.generate(problem, netName, maxObjs, allNodes, globalIDs, aliasPair)
 
-    if problem.name == 'Basic Problem C-03':
-        ipdb.set_trace()
+    # if problem.name == 'Basic Problem C-03':
+    #     ipdb.set_trace()
     return Nets
 
 def diffCompare(diff0, diff1):
