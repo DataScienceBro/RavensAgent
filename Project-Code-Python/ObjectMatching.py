@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import copy
-import ipdb
+# import ipdb
 
 from AttributeTypes import vocab, weights
 from SemanticNetwork import SemEdge

@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import copy
-import ipdb
+# import ipdb
 
 from AttributeTypes import attrGen
 
@@ -16,7 +16,18 @@ class SemNet:
         edges = []
         locallyUsedIDs = set()
 
+        matchPart1 = []
+        matchPart2 = []
         for objName, objVal in ravenFigure.objects.items():
+            if aliasPair and aliasPair[objName] != -1:
+                matchPart1.append(objName)
+            else:
+                matchPart2.append(objName)
+        objList = matchPart1 + matchPart2
+
+        for objName in objList:
+            # save manual -1 matches for later
+            objVal = ravenFigure.objects[objName]
 
             node = None
             # if we can alias this node automatically

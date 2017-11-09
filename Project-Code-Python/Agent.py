@@ -12,7 +12,7 @@
 from PIL import Image
 import numpy as np
 import copy
-import ipdb
+# import ipdb
 
 from SemanticNetwork import SemNode, SemNet
 from Transformations import ruleFuncs
@@ -41,14 +41,16 @@ class Agent:
     def Solve(self,problem):
         SemNode.objectIDs = 0
 
-        
-
         # if not problem.problemType == '2x2':
 
         #     # Skip 3x3 problems (not implemented)
 
+        # if problem.name ==
+
         challenge = problem.name.startswith('Challenge') # no text representation
 
+        if challenge and problem.problemType == '3x3' and not problem.hasVerbal:
+            return -1;
 
         config = (
             {
@@ -95,12 +97,13 @@ class Agent:
             # generate object mappings between figures and identify maximum number of objects for Net dimensionality
             aliasPairRef, maxObjs = matchObjects(problem, rel, fMats)
 
-            # matchObjectFeatures(fMats['A'], fMats['B'])
-
             Nets = computeSemNets(problem, aliasPairRef, maxObjs, netParams)
 
             ansScores = evaluateSemDiffs(problem, Nets, ansScores)
 
+
+            if problem.problemType == '3x3':
+                ansScores = inferNumObjects(problem, ansScores)
 
         sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
         # print(sortAns)
@@ -151,8 +154,6 @@ def visualGenAndTest(problem, rel, ansScores):
 
 def evaluateSemDiffs(problem, Nets, ansScores):
     # ipdb.set_trace()
-    if problem.name == 'Basic Problem C-08':
-        ipdb.set_trace()
 
     if problem.problemType == '2x2':
 
@@ -205,8 +206,6 @@ def computeSemNets(problem, aliasPairRef, maxObjs, netParams):
     globalIDs = {}
 
     for netName, objPair in netParams:
-        if problem.name == 'Basic Problem C-08' and netName=='F':
-            ipdb.set_trace()
         # aliasPair = aliasPairRef[objPair] if objPair else None
         aliasPair = aliasPairRef[objPair] if objPair else None
         Nets[netName] = SemNet.generate(problem, netName, maxObjs, allNodes, globalIDs, aliasPair)
@@ -266,8 +265,43 @@ def diffCompare(diff0, diff1):
     else:
         return 0
 
-def inferNumObjects(problem):
-    pass
+def inferNumObjects(problem, ansScores):
+    for key, val in ansScores.items():
+        ansScores[key] = round(val, 2)
+
+    # print('\tpre-inference: {0}'.format(ansScores))
+    #  do only for 3x3
+    fName = ['A','B','C','D','E','F','G','H']
+    arr = []
+
+    for f in fName:
+        arr.append(len(problem.figures[f].objects))
+
+    arr.append(None)
+
+    formattedArr = np.reshape(np.asarray(arr, dtype=float), (3,3))
+
+    # print(formattedArr)
+
+    rowPred, colPred = interpolateObjectCount(formattedArr)
+
+    # print('\tguess:{0}, {1}'.format(rowPred, colPred))
+
+    for ansNum in range(1, 9):
+        ansKey = str(ansNum)
+        if len(problem.figures[ansKey].objects) == rowPred:
+            ansScores[ansKey] += 10
+
+        if len(problem.figures[ansKey].objects) == colPred:
+            ansScores[ansKey] += 10
+
+        if len(problem.figures[ansKey].objects) == rowPred and len(problem.figures[ansKey].objects) == colPred:
+            ansScores[ansKey] += 20
+
+    # print('\tpost-inference: {0}'.format(ansScores))
+
+    return ansScores
+
 
 # given a 3x3 array of numbers with the bottom right being nan, predict the bottom right number
 def interpolateObjectCount(arr):
@@ -303,7 +337,7 @@ def interpolateObjectCount(arr):
         eq = np.round(np.polyfit(index[0:2], knownVals, 1) * 2) / 2
         colPtrn[2,i] = np.polyval(eq, 2)
 
-    ipdb.set_trace()
+    # ipdb.set_trace()
 
     # row prediction of items in ?
     rowPrediction = np.polyval(rowPtrn[2,:], 2)
