@@ -1,8 +1,106 @@
 from PIL import Image
 import numpy as np
 import copy
+# import ipdb
 
 from AttributeTypes import attrGen
+
+class SemNet:
+
+    @staticmethod
+    def generate(problem, netName, dim, allNodes, globalIDs, aliasPair):
+        ravenFigure = problem.figures[netName]
+        adjMat = np.zeros((dim, dim), dtype=object)
+
+        # print('got omap')
+        edges = []
+        locallyUsedIDs = set()
+
+        matchPart1 = []
+        matchPart2 = []
+        for objName, objVal in ravenFigure.objects.items():
+            if aliasPair and aliasPair[objName] != -1:
+                matchPart1.append(objName)
+            else:
+                matchPart2.append(objName)
+        objList = matchPart1 + matchPart2
+
+        for objName in objList:
+            # save manual -1 matches for later
+            objVal = ravenFigure.objects[objName]
+
+            node = None
+            # if we can alias this node automatically
+            if aliasPair and aliasPair[objName] != -1:
+                aliasName = aliasPair[objName]
+                # print('using alias: {0}'.format(aliasName))
+                node = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
+
+            # if generating another id category still leaves room for one more
+            elif SemNode.objectIDs < dim:
+                node = SemNode.convert(objName, objVal, edges)
+
+            # manually choosing alias
+            else:
+                aliasName = manualCandidateMatch(problem, locallyUsedIDs, globalIDs, objVal)
+                node = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
+
+            # add the node into the Semantic network, allNodes libary, locallyUsedIDS, globalIDs libary
+            adjMat[node.id][node.id] = node
+            allNodes[objName]= node
+            locallyUsedIDs.add(node.id)
+
+            if not node.id in globalIDs:
+                globalIDs[node.id] = []
+            globalIDs[node.id].append(objName)
+
+
+        # have all nodes in Semnet now
+        # have all internalLinks, so place edges now accordingly
+        if edges:
+            # print('edges with internal links!')
+            for node0, edge, nodes1 in edges:
+                nodes1 = nodes1.split(',')
+                for node1 in nodes1:
+                    row = allNodes[node0].id
+                    col = allNodes[node1].id
+
+                    if adjMat[row][col] and isinstance(adjMat[row][col], SemEdge):
+                        # some edge already exists, so append
+                        adjMat[row][col].addEdge(edge)
+                    else:
+                        # new edge
+                        adjMat[row][col] = SemEdge.generate(edge)
+
+                # print(node0, edge, node1)
+
+        return SemNet(len(ravenFigure.objects), adjMat)
+
+    def __init__(self, status, adjMat = 0):
+        # print('creating semnet', type(adjMat))
+        self.status = status
+        self.adjMat = adjMat
+
+    def __sub__(self, other):
+        if other and isinstance(other, SemNet):
+            return SemNet(self.status - other.status, self.adjMat - other.adjMat)
+        else:
+            return None
+
+        # print('subtacting two sem nets', type(self.adjMat), type(other.adjMat))
+
+    def __rsub__(self, other):
+        if other and isinstance(other, SemNet):
+            return other - self
+        else:
+            return None
+
+    def __str__(self):
+        return '\n\t{0}\n'.format(str(self.adjMat))
+
+    def __repr__(self):
+        return self.__str__()
+
 
 class SemNode:
     objectIDs = 0
@@ -13,7 +111,9 @@ class SemNode:
         if alias:
             nID = alias.id
         else:
+            # use the current id and then increment it for the next node to use if necessary
             nID = SemNode.objectIDs
+            # print('{0} is a new object: {1}'.format(objName, SemNode.objectIDs))
             SemNode.objectIDs += 1
 
         nodeAttrs = {}
@@ -65,7 +165,7 @@ class SemNode:
             raise ValueError('Node Subtraction: Inconsistent Types!', self, other)
 
     def __str__(self):
-        return '(id{0}, st{1}) - {2}'.format(self.id, self.status, self.attributes)
+        return '\n\tID: {0}, ST: {1}, ATRS: {2}\n'.format(self.id, self.status, self.attributes)
         # return 'id:', str(self.id),'status:',str(self.status), 'attr:',str(self.attributes)
 
     def __repr__(self):
@@ -107,82 +207,57 @@ class SemEdge:
     def addEdge(self, edgeType):
         self.attributes.add(edgeType)
 
-class SemNet:
-
-    @staticmethod
-    def generate(ravenFigure, dim, allNodes, dualOMaps):
-        adjMat = np.zeros((dim, dim), dtype=object)
-
-        # print('got omap')
-        edges = []
-
-        for objName, objVal in ravenFigure.objects.items():
-
-            n = None
-            if dualOMaps:
-                aliasName = dualOMaps[1][objName]
-                n = SemNode.convert(objName, objVal, edges, allNodes[aliasName])
-            else:
-                n = SemNode.convert(objName, objVal, edges)
-            allNodes[objName]= n
-            try:
-                adjMat[n.id][n.id] = n
-            except IndexError:
-                # TODO: remove this patch and implement better object matching
-                return None
-
-
-
-        # have all nodes in Semnet now
-        # have all internalLinks, so place edges now accordingly
-        if edges:
-            # print('edges with internal links!')
-            for node0, edge, nodes1 in edges:
-                nodes1 = nodes1.split(',')
-                for node1 in nodes1:
-                    row = allNodes[node0].id
-                    col = allNodes[node1].id
-
-                    if adjMat[row][col] and isinstance(adjMat[row][col], SemEdge):
-                        # some edge already exists, so append
-                        adjMat[row][col].addEdge(edge)
-                    else:
-                        # new edge
-                        adjMat[row][col] = SemEdge.generate(edge)
-
-                # print(node0, edge, node1)
-
-        return SemNet(len(ravenFigure.objects), adjMat)
-
-    def __init__(self, status, adjMat = 0):
-        # print('creating semnet', type(adjMat))
-        self.status = status
-        self.adjMat = adjMat
-
-    def __sub__(self, other):
-        if other and isinstance(other, SemNet):
-            return SemNet(self.status - other.status, self.adjMat - other.adjMat)
-        else:
-            return None
-
-        # print('subtacting two sem nets', type(self.adjMat), type(other.adjMat))
-
-    def __rsub__(self, other):
-        if other and isinstance(other, SemNet):
-            return other - self
-        else:
-            return None
-
     def __str__(self):
-        return str(self.adjMat)
+        return '{0}~{1}'.format(self.status, self.attributes)
 
     def __repr__(self):
         return self.__str__()
 
 
 
+def manualCandidateMatch(problem, locallyUsedIDs, globalIDs, objVal):
+    # go through all current objectIDs and choose best among unused categories
+    candidates = {}
+    for i in range(0, SemNode.objectIDs):
+        if (not i in locallyUsedIDs):
+            # candidates += globalIDs[i]
+            for c in globalIDs[i]:
+                candidates[c] = None
+
+    # get all the object attributes from original problem for easy comparison
+    # TODO: 4 lines of bad redundant work, fix this later
+    for figName2, figObj2 in problem.figures.items():
+        # print('Scanning {0}'.format(figName2))
+        for objName2, objVal2 in figObj2.objects.items():
+            if objName2 in candidates:
+                candidates[objName2] = objVal2.attributes
+
+    # print('could use {0}'.format(candidates))
+    o0attrs = objVal.attributes
 
 
+    minDiffScore = None
+    bestPairedName = None
+    for name1, o1attrs in candidates.items():
+        diffScore = 0
+
+        for attr0 in o0attrs:
+            if attr0 in o1attrs:
+                diffScore -= 1.25
+                if o0attrs[attr0] == o1attrs[attr0]:
+                    diffScore -= 2
+            else:
+                diffScore += 0.5
+        for attr1 in o1attrs:
+            if not attr1 in o0attrs:
+                diffScore += 0.5
+
+        # update best diff score if applicable
+        if minDiffScore == None or diffScore < minDiffScore: # if we find an object pairing with few diffs update our objectMap
+            minDiffScore = diffScore
+            bestPairedName = name1
+
+    return bestPairedName
 
 
 

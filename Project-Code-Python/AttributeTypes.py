@@ -1,13 +1,91 @@
 from PIL import Image
 import numpy as np
 
+vocab = {
+    'width': {
+        'null': [-1],
+        'very small': [0],
+        'small': [1],
+        'medium': [2],
+        'large': [3],
+        'very large': [4],
+        'huge': [5],
+    },
+    'height': {
+        'null': [-1],
+        'very small': [0],
+        'small': [1],
+        'medium': [2],
+        'large': [3],
+        'very large': [4],
+        'huge': [5],
+    },
+    'fill': {
+        'null': [-1, -1, -1, -1],
+        'yes': [1, 1, 1, 1],
+        'no': [0, 0, 0, 0],
+        'right-half': [0, 1, 0, 1],
+        'left-half': [1, 0, 1, 0],
+        'top-half': [1, 1, 0 ,0],
+        'bottom-half': [0, 0, 1, 1],
+    },
+    'shape': {
+        'null': [-1, -1],
+        'triangle': [0, 3],
+        'right triangle': [1, 3],
+        'square': [2, 4],
+        'rectangle': [3, 4],
+        'diamond': [4, 4],
+        'pentagon': [5, 5],
+        'octagon': [6, 8],
+        'star': [7, 10],
+        'plus': [8, 12],
+        'circle': [9, 0],
+        'pac-man': [10, 0],
+        'heart': [11, 0],
+    },
+    'angle': [],
+    'inside': [1],
+    'above': [1],
+    'left-of': [1],
+    'alignment': {
+        'null': [-1, -1, -1, -1],
+        'top-left': [1, 0, 0, 0],
+        'top-right': [0, 1, 0, 0],
+        'bottom-left': [0, 1, 1, 0],
+        'bottom-right': [0, 0, 0, 1],
+    }
+}
+
+weights = np.asarray([
+        0.500, # width
+        0.500, # height
+        0.200, # fill1
+        0.200, # fill2
+        0.200, # fill3
+        0.200, # fill4
+        1.000, # shapeID
+        0.500, # shapeSides
+        0.750, # angle
+        0.200, # inside
+        0.200, # above
+        0.200, # left-of
+        0.125, # align1
+        0.125, # align2
+        0.125, # align3
+        0.125, # align4
+    ])
+
+
 # TODO: make more OOP! have a parent attribute class with common methods/vars
 
 def attrGen(nodeAttrs, attrName, attrVal):
     if attrName == 'shape':
         nodeAttrs[attrName] = Shape.convert(attrVal)
-    elif attrName == 'size':
-        nodeAttrs[attrName] = Size.convert(attrVal)
+    elif attrName == 'width':
+        nodeAttrs[attrName] = Width.convert(attrVal)
+    elif attrName == 'height':
+        nodeAttrs[attrName] = Height.convert(attrVal)
     elif attrName == 'angle':
         nodeAttrs[attrName] = Angle.convert(attrVal)
     elif attrName == 'alignment':
@@ -54,14 +132,21 @@ class Shape:
     def __ne__(self, other):
         return not self.__eq__(other)
 
-# Size Attribute Wrapper
-class Size:
+    def __str__(self):
+        return '{0}, {1}'.format(self.status, self.props)
+
+    def __repr__(self):
+        return self.__str__()
+
+
+# Width Attribute Wrapper
+class Width:
     scale2Num = {'very small': 0, 'small': 1, 'medium': 2, 'large': 3, 'very large': 4,'huge': 5}
     # num2Scale = ['very small', 'small', 'medium', 'large', 'very large', 'huge']
 
     @staticmethod
-    def convert(sizeName):
-        return Size(1, {'size': Size.scale2Num[sizeName]})
+    def convert(widthName):
+        return Width(1, {'width': Width.scale2Num[widthName]})
 
     def __init__(self, status, props):
         self.status = status
@@ -69,21 +154,21 @@ class Size:
 
     def __sub__(self, other):
         if other == 0:
-            return Size(self.status, self.props.copy())
+            return Width(self.status, self.props.copy())
 
         newStatus = self.status - other.status
         if newStatus:
-            return Size(newStatus, self.props.copy())
+            return Width(newStatus, self.props.copy())
         elif self.props == other.props:
             return 0
         else:
-            return Size(0, {'size': self.props['size'] - other.props['size']})
+            return Width(0, {'width': self.props['width'] - other.props['width']})
 
 
     def __rsub__(self, other):
         if other == 0:
-            return Shape(-1, self.props.copy())
-        raise ValueError('Size Subtraction: Inconsistent Types!', self, other)
+            return Width(-1, self.props.copy())
+        raise ValueError('Width Subtraction: Inconsistent Types!', self, other)
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
@@ -92,6 +177,60 @@ class Size:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return '{0}, {1}'.format(self.status, self.props)
+
+    def __repr__(self):
+        return self.__str__()
+
+
+
+
+# Height Attribute Wrapper
+class Height:
+    scale2Num = {'very small': 0, 'small': 1, 'medium': 2, 'large': 3, 'very large': 4,'huge': 5}
+    # num2Scale = ['very small', 'small', 'medium', 'large', 'very large', 'huge']
+
+    @staticmethod
+    def convert(heightName):
+        return Height(1, {'height': Height.scale2Num[heightName]})
+
+    def __init__(self, status, props):
+        self.status = status
+        self.props = props
+
+    def __sub__(self, other):
+        if other == 0:
+            return Height(self.status, self.props.copy())
+
+        newStatus = self.status - other.status
+        if newStatus:
+            return Height(newStatus, self.props.copy())
+        elif self.props == other.props:
+            return 0
+        else:
+            return Height(0, {'height': self.props['height'] - other.props['height']})
+
+
+    def __rsub__(self, other):
+        if other == 0:
+            return Height(-1, self.props.copy())
+        raise ValueError('Height Subtraction: Inconsistent Types!', self, other)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.__dict__ == other.__dict__
+        return False
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return '{0}, {1}'.format(self.status, self.props)
+
+    def __repr__(self):
+        return self.__str__()
 
 # Angle Attribute
 class Angle:
@@ -130,6 +269,12 @@ class Angle:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return '{0}, {1}'.format(self.status, self.props)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Alignment: # top, bottom
@@ -172,6 +317,12 @@ class Alignment: # top, bottom
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __str__(self):
+        return '{0}, {1}'.format(self.status, self.props)
+
+    def __repr__(self):
+        return self.__str__()
+
 class Fill:
     # 1 = quadrant filled, 0 = quadrant empty, quadrants represented left to right
     fill2Num = {'yes': (1, 1, 1, 1), 'no': (0, 0, 0, 0), 'right-half': (0, 1, 0, 1), 'left-half': (1, 0, 1, 0), 'top-half': (1, 1, 0 ,0), 'bottom-half': (0, 0, 1, 1)}
@@ -210,3 +361,9 @@ class Fill:
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    def __str__(self):
+        return '{0}, {1}'.format(self.status, self.props)
+
+    def __repr__(self):
+        return self.__str__()
