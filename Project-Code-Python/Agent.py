@@ -79,10 +79,11 @@ class Agent:
         # GENERATE AND TEST APPROACH
         if problem.hasVisual:
 
-            # try:
-            ansScores = visualGenAndTest(problem, rel, ansScores)
-            # except:
-                # return -1
+            try:
+                ansScores = visualGenAndTest(problem, rel, ansScores)
+            except:
+                if not problem.hasVerbal:
+                    return -1
 
             # challenge hack
             if challenge:
@@ -169,8 +170,8 @@ def visualGenAndTest(problem, rel, ansScores):
         #     ipdb.set_trace()
         fig2BlackPxCnt = lambda fig: np.count_nonzero(np.asarray(Image.open(fig.visualFilename).resize((46, 46))) <= 128)
         approximatePredict = lambda actual, prediction: abs(actual - prediction) < 0.08 * 46 * 46
-        ansScores = numericalPredict(problem, ansScores, fig2BlackPxCnt, approximatePredict, rewardMult = 1.75)
-        print('pixel count interpolation yields:', ansScores)
+        ansScores = numericalPredict(problem, ansScores, fig2BlackPxCnt, approximatePredict, rewardMult = 2)
+        # print('pixel count interpolation yields:', ansScores)
 
         rules['row'] = None
         rules['col'] = None
@@ -199,8 +200,7 @@ def visualGenAndTest(problem, rel, ansScores):
                 #     ipdb.set_trace()
                 if ruleFunc(img0, img1, img2, size) and ruleFunc(img3, img4, img5, size):
 
-                    # orientation = 'row' if i == 0 else 'col'
-                    print('\t', orientation[i], 'Rule Found:', ruleName)
+                    # print('\t', orientation[i], 'Rule Found:', ruleName)
                     rules[orientation[i]] = ruleFunc
                     break
 
@@ -248,16 +248,8 @@ def visualGenAndTest(problem, rel, ansScores):
                 ansScores[ansKey] += horizTest * 20 + vertTest * 20 + (horizTest * vertTest) * 20 + diag_drTest * (20 if vertTest!= 0 or horizTest != 0 else 100)
 
         else:
-            print('gotta use visshapes?')
-            # ipdb.set_trace()
-            # extract shapes visually use rectangularity for set equivalence,
-            # vobjMap = {}
-            # for figName, figObj in problem.figures.items():
-            #     vobjMap[figName] = scanVisualShapes(np.asarray(Image.open(figObj.visualFilename)))
-
-
-
-
+            # print('\tusing visual shapes')
+            ansScores = analyzeVisualShapes(problem, ansScores)
 
     return ansScores
 
@@ -454,17 +446,73 @@ def interpolate(arr):
 
     return (rowPrediction, colPrediction)
 
+def analyzeVisualShapes(problem, ansScores):
+    rectSets = {}
+    # ipdb.set_trace()
 
-def scanVisualShapes(img):
+    for figName, figObj in problem.figures.items():
+        figImg = (np.asarray(Image.open(figObj.visualFilename).resize((92, 92))) > 128)* 255
+        rectSets[figName] = img2RectLists(figImg)
+
+    # have all the figure's respective vshape representations
+    # observe vshapes that appear across figures in the same row/col/diag
+    # if same vshape appears in A/B/C and another appears in D/E/F,
+    #   expect ans to have whatever shape is common between G and H
+    rowCommon = len(vsAND(vsAND(rectSets['A'], rectSets['B']), rectSets['C'])) > 0 and len(vsAND(vsAND(rectSets['D'], rectSets['E']), rectSets['F'])) > 0
+    colCommon = len(vsAND(vsAND(rectSets['A'], rectSets['D']), rectSets['G'])) > 0 and len(vsAND(vsAND(rectSets['B'], rectSets['E']), rectSets['H'])) > 0
+    diag_drCommon = len(vsAND(vsAND(rectSets['B'], rectSets['F']), rectSets['G'])) > 0 and len(vsAND(vsAND(rectSets['C'], rectSets['D']), rectSets['H'])) > 0
+
+    expect = []
+
+    if not (rowCommon or colCommon or diag_drCommon):
+        sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
+        if sortAns[0][1] > sortAns[1][1]:
+            return ansScores
+        else:
+            raise Exception
+    
+    if rowCommon:
+        expect += vsAND(rectSets['G'], rectSets['H'])
+
+    if colCommon:
+        expect += vsAND(rectSets['C'], rectSets['F'])
+
+    if diag_drCommon:
+        expect += vsAND(rectSets['A'], rectSets['E'])
+
+    for ansNum in range(1,9):
+        ansKey = str(ansNum)
+        ansImg = (np.asarray(Image.open(problem.figures[ansKey].visualFilename).resize((92, 92))) > 128) * 255
+        actual = img2RectLists(ansImg)
+        match = len(vsAND(expect, actual))
+        # print(ansKey, str(match))
+        ansScores[ansKey] += match * 50
+
+    return ansScores
+
+
+def img2RectLists(img):
     cImg = np.copy(img)
-    rows, cols = cImg.shape
-    vshapes = {}
+    # ipdb.set_trace()
+    rows, cols, _ = cImg.shape
+    vshapes = []
     for r in range(0, rows):
         for c in range(0, cols):
-            if cImg[r,c] == 0:
+            if np.any(cImg[r,c] == 0):
+                # ipdb.set_trace()
                 vs = VisShape(r, c, cImg)
-                if not vs in vshapes:
-                    vshapes[vs] = 0
-                vshapes[vs] += 1
+                vshapes.append(vs)
 
     return vshapes
+
+percentDiff = lambda q1, q2: abs((q1-q2)/q2)
+
+def vsAND(rL0, rL1):
+    intersection = []
+    for vs0 in rL0:
+        for vs1 in rL1:
+            # if area of the shapes are less than 5% different AND
+            if percentDiff(vs0.area, vs1.area) < 0.15 and percentDiff(vs0.rectangularity, vs1.rectangularity) < 0.15:
+                intersection += [vs0, vs1]
+
+    return list(set(intersection))
