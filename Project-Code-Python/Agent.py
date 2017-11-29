@@ -12,11 +12,13 @@
 from PIL import Image
 import numpy as np
 import copy
-# import ipdb
 
+import ipdb
+import math
 from SemanticNetwork import SemNode, SemNet
-from Transformations import ruleFuncs
+from Transformations import ruleFuncs, ruleFuncs3
 from ObjectMatching import *
+from VisShape import VisShape
 # from Misc import CustomFigure, CustomObject
 
 class Agent:
@@ -49,9 +51,6 @@ class Agent:
 
         challenge = problem.name.startswith('Challenge') # no text representation
 
-        if challenge and problem.problemType == '3x3' and not problem.hasVerbal:
-            return -1;
-
         config = (
             {
                 'A': ['B','C'],
@@ -78,10 +77,14 @@ class Agent:
         rel, ansScores, netParams = config
 
         # GENERATE AND TEST APPROACH
-        if problem.hasVisual and problem.problemType == '2x2':
+        if problem.hasVisual:
 
+            # try:
             ansScores = visualGenAndTest(problem, rel, ansScores)
+            # except:
+                # return -1
 
+            # challenge hack
             if challenge:
                 sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
                 if sortAns[0][1] > sortAns[1][1]:
@@ -90,8 +93,11 @@ class Agent:
                     return -1
 
 
+
         # SEMANTIC NETWORK APPROACH
         if problem.hasVerbal:
+            ansScores = {key: value for key, value in ansScores.items()}
+            # import ipdb; ipdb.set_trace()
             fMats = constructFigureFeatureMatrices(problem)
 
             # generate object mappings between figures and identify maximum number of objects for Net dimensionality
@@ -103,7 +109,9 @@ class Agent:
 
 
             if problem.problemType == '3x3':
-                ansScores = inferNumObjects(problem, ansScores)
+                fig2ObjCnt = lambda fig: len(fig.objects)
+                exactPredict = lambda actual, prediction: actual == prediction
+                ansScores = numericalPredict(problem, ansScores, fig2ObjCnt, exactPredict)
 
         sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
         # print(sortAns)
@@ -114,41 +122,142 @@ def visualGenAndTest(problem, rel, ansScores):
     # if we find a AB relation, then we have generated a horizontal rule and test all the C#
 
     # if we find a AC relation, then we have generated a vertical rule and test all the B#
-
-    aImg = np.asarray(Image.open(problem.figures['A'].visualFilename))
-    aImg = (aImg > 128) * 255
-    imgMatchThreshold = 0.02 * aImg.size
-
     rules = {}
-    # generate rule
-    for sibling in rel['A']:
-        sibImg = np.asarray(Image.open(problem.figures[sibling].visualFilename))
-        sibImg = (sibImg > 128) * 255
 
-        for ruleName, ruleFunc in ruleFuncs.items():
-            if ruleFunc(aImg, sibImg, imgMatchThreshold):
-                # print('Rule Found:', ruleName)
-                rules['A' + sibling] = ruleFunc
-                break
-        # continue to next directional rule
+    # if problem.name == 'Basic Problem D-01':
+    #     ipdb.set_trace()
 
-    # test for candidates using a 3 point scale
-    # candidateDiffs = {2: [], 1: [], 0: []}
+    if problem.problemType == '2x2':
 
-    cImg = np.asarray(Image.open(problem.figures['C'].visualFilename))
-    cImg = (cImg > 128) * 255
-    bImg = np.asarray(Image.open(problem.figures['B'].visualFilename))
-    bImg = (bImg > 128) * 255
+        aImg = np.asarray(Image.open(problem.figures['A'].visualFilename))
+        aImg = (aImg > 128) * 255
+        imgMatchThreshold = 0.02 * aImg.size
 
-    for ansNum in range(1,7):
-        ansKey = str(ansNum)
-        ansImg = np.asarray(Image.open(problem.figures[ansKey].visualFilename))
-        ansImg = (ansImg > 128) * 255
-        horizTest = rules['AB'](cImg, ansImg, imgMatchThreshold) if 'AB' in rules else 0
-        vertTest = rules['AC'](bImg, ansImg, imgMatchThreshold) if 'AC' in rules else 0
-        # candidateDiffs[horizTest + vertTest].append(str(ansNum))
-        ansScores[ansKey] += horizTest * 10 + vertTest * 10
-    # print(ansScores)
+        # generate rule
+        for sibling in rel['A']:
+            sibImg = np.asarray(Image.open(problem.figures[sibling].visualFilename))
+            sibImg = (sibImg > 128) * 255
+
+            for ruleName, ruleFunc in ruleFuncs.items():
+                if ruleFunc(aImg, sibImg, imgMatchThreshold):
+                    # print('Rule Found:', ruleName)
+                    rules['A' + sibling] = ruleFunc
+                    break
+            # continue to next directional rule
+
+        # test for candidates using a 3 point scale
+        # candidateDiffs = {2: [], 1: [], 0: []}
+
+        cImg = np.asarray(Image.open(problem.figures['C'].visualFilename))
+        cImg = (cImg > 128) * 255
+        bImg = np.asarray(Image.open(problem.figures['B'].visualFilename))
+        bImg = (bImg > 128) * 255
+
+        for ansNum in range(1,7):
+            ansKey = str(ansNum)
+            ansImg = np.asarray(Image.open(problem.figures[ansKey].visualFilename))
+            ansImg = (ansImg > 128) * 255
+            horizTest = rules['AB'](cImg, ansImg, imgMatchThreshold) if 'AB' in rules else 0
+            vertTest = rules['AC'](bImg, ansImg, imgMatchThreshold) if 'AC' in rules else 0
+            # candidateDiffs[horizTest + vertTest].append(str(ansNum))
+            ansScores[ansKey] += horizTest * 10 + vertTest * 10
+        # print(ansScores)
+    else:
+        # if problem.name == 'Basic Problem D-01':
+        #             ipdb.set_trace()
+        # if problem.name == 'Basic Problem C-12':
+        #     ipdb.set_trace()
+        fig2BlackPxCnt = lambda fig: np.count_nonzero(np.asarray(Image.open(fig.visualFilename).resize((46, 46))) <= 128)
+        approximatePredict = lambda actual, prediction: abs(actual - prediction) < 0.08 * 46 * 46
+        ansScores = numericalPredict(problem, ansScores, fig2BlackPxCnt, approximatePredict, rewardMult = 1.75)
+        print('pixel count interpolation yields:', ansScores)
+
+        rules['row'] = None
+        rules['col'] = None
+        rules['diag_dr'] = None
+        # rules['diag_dl'] = None
+
+        tripletPairs = [
+            ('ABC', 'DEF'), # 0: row rule
+            ('ADG', 'BEH'), # 1: col rule
+            ('BFG', 'CDH')  # 0: downright diag rule
+            # ('AFH', 'CDH')  # 0: downright diag rule
+        ]
+        orientation = ['row', 'col', 'diag_dr']
+        size = 184 * 184
+        for i, tP in enumerate(tripletPairs):
+            img0 = (np.asarray(Image.open(problem.figures[tP[0][0]].visualFilename)) > 128) * 255
+            img1 = (np.asarray(Image.open(problem.figures[tP[0][1]].visualFilename)) > 128) * 255
+            img2 = (np.asarray(Image.open(problem.figures[tP[0][2]].visualFilename)) > 128) * 255
+
+            img3 = (np.asarray(Image.open(problem.figures[tP[1][0]].visualFilename)) > 128) * 255
+            img4 = (np.asarray(Image.open(problem.figures[tP[1][1]].visualFilename)) > 128) * 255
+            img5 = (np.asarray(Image.open(problem.figures[tP[1][2]].visualFilename)) > 128) * 255
+
+            for ruleName, ruleFunc in ruleFuncs3.items():
+                # if problem.name == 'Basic Problem D-02':
+                #     ipdb.set_trace()
+                if ruleFunc(img0, img1, img2, size) and ruleFunc(img3, img4, img5, size):
+
+                    # orientation = 'row' if i == 0 else 'col'
+                    print('\t', orientation[i], 'Rule Found:', ruleName)
+                    rules[orientation[i]] = ruleFunc
+                    break
+
+        # if problem.name == 'Basic Problem E-08':
+        #     ipdb.set_trace()
+
+        if rules['row'] != None or rules['col'] != None or rules['diag_dr'] != None:
+            # found a basic row rule or col rule
+            for ansNum in range(1,9):
+                ansKey = str(ansNum)
+                ansImg = (np.asarray(Image.open(problem.figures[ansKey].visualFilename)) > 128) * 255
+                horizTest = 0
+                vertTest = 0
+                diag_drTest = 0
+
+                if rules['row'] != None:
+                    # if problem.name == 'Basic Problem E-01':
+                    #     ipdb.set_trace()
+                    # # boost the row rule suited answer
+                    imgG = (np.asarray(Image.open(problem.figures['G'].visualFilename)) > 128) * 255
+                    imgH = (np.asarray(Image.open(problem.figures['H'].visualFilename)) > 128) * 255
+
+                    if rules['row'](imgG, imgH, ansImg, size):
+                        # ansImage satisfies this row rule
+                        horizTest = 1
+
+                if rules['col'] != None:
+                    # boost the row rule suited answer
+                    imgC = (np.asarray(Image.open(problem.figures['C'].visualFilename)) > 128) * 255
+                    imgF = (np.asarray(Image.open(problem.figures['F'].visualFilename)) > 128) * 255
+
+                    if rules['col'](imgC, imgF, ansImg, size):
+                        # ansImage satisfies this row rule
+                        vertTest = 1
+
+                if rules['diag_dr'] != None:
+                    # boost the row rule suited answer
+                    imgA = (np.asarray(Image.open(problem.figures['A'].visualFilename)) > 128) * 255
+                    imgE = (np.asarray(Image.open(problem.figures['E'].visualFilename)) > 128) * 255
+
+                    if rules['diag_dr'](imgA, imgE, ansImg, size):
+                        # ansImage satisfies this row rule
+                        diag_drTest = 1
+
+                ansScores[ansKey] += horizTest * 20 + vertTest * 20 + (horizTest * vertTest) * 20 + diag_drTest * (20 if vertTest!= 0 or horizTest != 0 else 100)
+
+        else:
+            print('gotta use visshapes?')
+            # ipdb.set_trace()
+            # extract shapes visually use rectangularity for set equivalence,
+            # vobjMap = {}
+            # for figName, figObj in problem.figures.items():
+            #     vobjMap[figName] = scanVisualShapes(np.asarray(Image.open(figObj.visualFilename)))
+
+
+
+
 
     return ansScores
 
@@ -265,46 +374,44 @@ def diffCompare(diff0, diff1):
     else:
         return 0
 
-def inferNumObjects(problem, ansScores):
+def numericalPredict(problem, ansScores, fig2Num, successFunc, rewardMult = 1):
     for key, val in ansScores.items():
         ansScores[key] = round(val, 2)
 
     # print('\tpre-inference: {0}'.format(ansScores))
     #  do only for 3x3
     fName = ['A','B','C','D','E','F','G','H']
-    arr = []
-
-    for f in fName:
-        arr.append(len(problem.figures[f].objects))
+    arr = [fig2Num(problem.figures[f]) for f in fName]
 
     arr.append(None)
 
-    formattedArr = np.reshape(np.asarray(arr, dtype=float), (3,3))
+    arr = np.reshape(np.asarray(arr, dtype=float), (3,3))
 
     # print(formattedArr)
 
-    rowPred, colPred = interpolateObjectCount(formattedArr)
+    rowPred, colPred = interpolate(arr)
+    # import ipdb; ipdb.set_trace()
 
     # print('\tguess:{0}, {1}'.format(rowPred, colPred))
 
     for ansNum in range(1, 9):
         ansKey = str(ansNum)
-        if len(problem.figures[ansKey].objects) == rowPred:
-            ansScores[ansKey] += 10
+        if successFunc(fig2Num(problem.figures[ansKey]), rowPred):
+            ansScores[ansKey] += 10 * rewardMult
 
-        if len(problem.figures[ansKey].objects) == colPred:
-            ansScores[ansKey] += 10
+        if successFunc(fig2Num(problem.figures[ansKey]), colPred):
+            ansScores[ansKey] += 10 * rewardMult
 
-        if len(problem.figures[ansKey].objects) == rowPred and len(problem.figures[ansKey].objects) == colPred:
-            ansScores[ansKey] += 20
+        if successFunc(fig2Num(problem.figures[ansKey]), rowPred) and successFunc(fig2Num(problem.figures[ansKey]), colPred):
+            ansScores[ansKey] += 20 * rewardMult
 
     # print('\tpost-inference: {0}'.format(ansScores))
 
     return ansScores
 
-
 # given a 3x3 array of numbers with the bottom right being nan, predict the bottom right number
-def interpolateObjectCount(arr):
+def interpolate(arr):
+    # import ipdb; ipdb.set_trace()
     # index of rows and cols
     index = np.asarray([0,1,2], dtype=float)
 
@@ -322,7 +429,7 @@ def interpolateObjectCount(arr):
 
     # index = np.asarray([[0],[1],[2]], dtype=float)
     rowPtrn = np.vstack((eqRow0, eqRow1, np.zeros((1,3))))
-    colPtrn = np.vstack((eqRow0, eqRow1, np.zeros((1,3))))
+    colPtrn = np.vstack((eqCol0, eqCol1, np.zeros((1,3))))
 
 
     # row interpolation
@@ -346,3 +453,18 @@ def interpolateObjectCount(arr):
     colPrediction = np.polyval(colPtrn[2,:], 2)
 
     return (rowPrediction, colPrediction)
+
+
+def scanVisualShapes(img):
+    cImg = np.copy(img)
+    rows, cols = cImg.shape
+    vshapes = {}
+    for r in range(0, rows):
+        for c in range(0, cols):
+            if cImg[r,c] == 0:
+                vs = VisShape(r, c, cImg)
+                if not vs in vshapes:
+                    vshapes[vs] = 0
+                vshapes[vs] += 1
+
+    return vshapes

@@ -1,0 +1,27 @@
+brainstorming
+
+percentage increase of black pixels
+difference of added black pixels
+xor
+addition
+subtraction
+percentage diff of pixels in 9 regions
+
+255 0   255 0
+0   255 0   255
+
++
+
+255 255 0   255
+0   255 0   0
+=================
+0   255 0   255
+255 0   255 0
+
++
+
+0   0   255 0
+255 0   255 255
+=================
+0   255 255 255
+500 255 255 0
