@@ -51,7 +51,7 @@ def solve():
                                                 # Your agent should return its answer at the conclusion of the execution of Solve.
 
                 results.write("%s,%s,%d\n" % (set.name, problem.name, answer))
-                print(set.name, problem.name, answer)
+                print(set.name, problem.name, answer,'\n')
     r.close()
 
 # The main execution will have your agent generate answers for all the problems,
