@@ -58,9 +58,9 @@ class VisShape:
 
         self.centroid = (self.netR / self.area, self.netC / self.area)
         boundingRectArea = ((self.bottom - self.top) * (self.right - self.left))
-        if boundingRectArea == 0:
-            print('zero area?!?!?')
-            import ipdb; ipdb.set_trace()
+        # if boundingRectArea == 0:
+            # print('zero area error')
+            # import ipdb; ipdb.set_trace()
         self.rectangularity = self.area / boundingRectArea
 
     def __str__(self):

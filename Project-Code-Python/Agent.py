@@ -13,7 +13,7 @@ from PIL import Image
 import numpy as np
 import copy
 
-import ipdb
+# import ipdb
 import math
 from SemanticNetwork import SemNode, SemNet
 from Transformations import ruleFuncs, ruleFuncs3
@@ -41,83 +41,85 @@ class Agent:
     # Make sure to return your answer *as an integer* at the end of Solve().
     # Returning your answer as a string may cause your program to crash.
     def Solve(self,problem):
-        SemNode.objectIDs = 0
+        # hailmary
+        try:
 
-        # if not problem.problemType == '2x2':
+            SemNode.objectIDs = 0
 
-        #     # Skip 3x3 problems (not implemented)
+            #     # Skip 3x3 problems (not implemented)
 
-        # if problem.name ==
+            # if problem.name ==
 
-        challenge = problem.name.startswith('Challenge') # no text representation
+            challenge = problem.name.startswith('Challenge') # no text representation
 
-        config = (
-            {
-                'A': ['B','C'],
-                'B': ['1', '2', '3', '4', '5', '6'],
-                'C': ['1', '2', '3', '4', '5', '6'],
-            },
-            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0},
-            (('A', None), ('B', 'AB'), ('C', 'AC'), ('1', 'C1') , ('2', 'C2'), ('3', 'C3'),('4', 'C4'), ('5', 'C5'), ('6', 'C6'))
-        ) if problem.problemType == '2x2' else (
-            {
-                'A': ['B', 'D'],
-                'B': ['C', 'E'],
-                'C': ['F'],
-                'D': ['G', 'E'],
-                'E': ['H', 'F'],
-                'F': ['1', '2', '3', '4', '5', '6', '7', '8'],
-                'G': ['H'],
-                'H': ['1', '2', '3', '4', '5', '6', '7', '8'],
-            },
-            {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0},
-            (('A', None), ('B', 'AB'), ('C', 'BC'), ('D', 'AD') , ('E', 'DE'), ('F', 'EF'),('G', 'DG'), ('H', 'EH'), ('1', 'H1') , ('2', 'H2'), ('3', 'H3'),('4', 'H4'), ('5', 'H5'), ('6', 'H6'), ('7', 'H7'), ('8', 'H8'))
-        )
+            config = (
+                {
+                    'A': ['B','C'],
+                    'B': ['1', '2', '3', '4', '5', '6'],
+                    'C': ['1', '2', '3', '4', '5', '6'],
+                },
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0},
+                (('A', None), ('B', 'AB'), ('C', 'AC'), ('1', 'C1') , ('2', 'C2'), ('3', 'C3'),('4', 'C4'), ('5', 'C5'), ('6', 'C6'))
+            ) if problem.problemType == '2x2' else (
+                {
+                    'A': ['B', 'D'],
+                    'B': ['C', 'E'],
+                    'C': ['F'],
+                    'D': ['G', 'E'],
+                    'E': ['H', 'F'],
+                    'F': ['1', '2', '3', '4', '5', '6', '7', '8'],
+                    'G': ['H'],
+                    'H': ['1', '2', '3', '4', '5', '6', '7', '8'],
+                },
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0, '6': 0, '7': 0, '8': 0},
+                (('A', None), ('B', 'AB'), ('C', 'BC'), ('D', 'AD') , ('E', 'DE'), ('F', 'EF'),('G', 'DG'), ('H', 'EH'), ('1', 'H1') , ('2', 'H2'), ('3', 'H3'),('4', 'H4'), ('5', 'H5'), ('6', 'H6'), ('7', 'H7'), ('8', 'H8'))
+            )
 
-        rel, ansScores, netParams = config
+            rel, ansScores, netParams = config
 
-        # GENERATE AND TEST APPROACH
-        if problem.hasVisual:
+            # GENERATE AND TEST APPROACH
+            if problem.hasVisual:
 
-            try:
-                ansScores = visualGenAndTest(problem, rel, ansScores)
-            except:
-                if not problem.hasVerbal:
-                    return -1
+                try:
+                    ansScores = visualGenAndTest(problem, rel, ansScores)
+                except:
+                    if not problem.hasVerbal:
+                        return -1
 
-            # challenge hack
-            if challenge:
-                sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
-                if sortAns[0][1] > sortAns[1][1]:
-                    return int(sortAns[0][0])
-                else:
-                    return -1
-
-
-
-        # SEMANTIC NETWORK APPROACH
-        if problem.hasVerbal:
-            ansScores = {key: value for key, value in ansScores.items()}
-            # import ipdb; ipdb.set_trace()
-            fMats = constructFigureFeatureMatrices(problem)
-
-            # generate object mappings between figures and identify maximum number of objects for Net dimensionality
-            aliasPairRef, maxObjs = matchObjects(problem, rel, fMats)
-
-            Nets = computeSemNets(problem, aliasPairRef, maxObjs, netParams)
-
-            ansScores = evaluateSemDiffs(problem, Nets, ansScores)
+                # challenge hack
+                if challenge:
+                    sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
+                    if sortAns[0][1] > sortAns[1][1]:
+                        return int(sortAns[0][0])
+                    else:
+                        return -1
 
 
-            if problem.problemType == '3x3':
-                fig2ObjCnt = lambda fig: len(fig.objects)
-                exactPredict = lambda actual, prediction: actual == prediction
-                ansScores = numericalPredict(problem, ansScores, fig2ObjCnt, exactPredict)
 
-        sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
-        # print(sortAns)
-        return int(sortAns[0][0])
+            # SEMANTIC NETWORK APPROACH
+            if problem.hasVerbal:
+                ansScores = {key: value for key, value in ansScores.items()}
+                # import ipdb; ipdb.set_trace()
+                fMats = constructFigureFeatureMatrices(problem)
 
+                # generate object mappings between figures and identify maximum number of objects for Net dimensionality
+                aliasPairRef, maxObjs = matchObjects(problem, rel, fMats)
+
+                Nets = computeSemNets(problem, aliasPairRef, maxObjs, netParams)
+
+                ansScores = evaluateSemDiffs(problem, Nets, ansScores)
+
+
+                if problem.problemType == '3x3':
+                    fig2ObjCnt = lambda fig: len(fig.objects)
+                    exactPredict = lambda actual, prediction: actual == prediction
+                    ansScores = numericalPredict(problem, ansScores, fig2ObjCnt, exactPredict)
+
+            sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
+            # print(sortAns)
+            return int(sortAns[0][0])
+        except:
+            return -1
 
 def visualGenAndTest(problem, rel, ansScores):
     # if we find a AB relation, then we have generated a horizontal rule and test all the C#
@@ -176,15 +178,15 @@ def visualGenAndTest(problem, rel, ansScores):
         rules['row'] = None
         rules['col'] = None
         rules['diag_dr'] = None
-        # rules['diag_dl'] = None
+        rules['diag_dl'] = None
 
         tripletPairs = [
             ('ABC', 'DEF'), # 0: row rule
             ('ADG', 'BEH'), # 1: col rule
-            ('BFG', 'CDH')  # 0: downright diag rule
-            # ('AFH', 'CDH')  # 0: downright diag rule
+            ('BFG', 'CDH'),  # 0: downright diag rule
+            ('AFH', 'CEG')  # 0: downleft diag rule
         ]
-        orientation = ['row', 'col', 'diag_dr']
+        orientation = ['row', 'col', 'diag_dr', 'diag_dl']
         size = 184 * 184
         for i, tP in enumerate(tripletPairs):
             img0 = (np.asarray(Image.open(problem.figures[tP[0][0]].visualFilename)) > 128) * 255
@@ -207,7 +209,7 @@ def visualGenAndTest(problem, rel, ansScores):
         # if problem.name == 'Basic Problem E-08':
         #     ipdb.set_trace()
 
-        if rules['row'] != None or rules['col'] != None or rules['diag_dr'] != None:
+        if rules['row'] != None or rules['col'] != None or rules['diag_dr'] != None or rules['diag_dl'] != None:
             # found a basic row rule or col rule
             for ansNum in range(1,9):
                 ansKey = str(ansNum)
@@ -215,6 +217,7 @@ def visualGenAndTest(problem, rel, ansScores):
                 horizTest = 0
                 vertTest = 0
                 diag_drTest = 0
+                diag_dlTest = 0
 
                 if rules['row'] != None:
                     # if problem.name == 'Basic Problem E-01':
@@ -245,7 +248,16 @@ def visualGenAndTest(problem, rel, ansScores):
                         # ansImage satisfies this row rule
                         diag_drTest = 1
 
-                ansScores[ansKey] += horizTest * 20 + vertTest * 20 + (horizTest * vertTest) * 20 + diag_drTest * (20 if vertTest!= 0 or horizTest != 0 else 100)
+                if rules['diag_dl'] != None:
+                    # boost the row rule suited answer
+                    imgB = (np.asarray(Image.open(problem.figures['B'].visualFilename)) > 128) * 255
+                    imgD = (np.asarray(Image.open(problem.figures['D'].visualFilename)) > 128) * 255
+
+                    if rules['diag_dl'](imgB, imgD, ansImg, size):
+                        # ansImage satisfies this row rule
+                        diag_dlTest = 1
+
+                ansScores[ansKey] += horizTest * 20 + vertTest * 20 + (horizTest * vertTest) * 20 + diag_drTest * (20 if vertTest!= 0 or horizTest != 0 else 100) + + diag_dlTest * (20 if vertTest!= 0 or horizTest != 0 else 100)
 
         else:
             # print('\tusing visual shapes')
@@ -454,6 +466,27 @@ def analyzeVisualShapes(problem, ansScores):
         figImg = (np.asarray(Image.open(figObj.visualFilename).resize((92, 92))) > 128)* 255
         rectSets[figName] = img2RectLists(figImg)
 
+    # do interpolation to try to predict how many objects in output
+    freqs = [len(rectSets[letter]) for letter in ('A','B','C','D','E','F','G','H')]
+    freqs += [None]
+    freqs = np.reshape(np.asarray(freqs, dtype=float), (3,3))
+
+    rowPred, colPred = interpolate(freqs)
+    for ansNum in range(1, 9):
+        ansKey = str(ansNum)
+        ansImg = (np.asarray(Image.open(problem.figures[ansKey].visualFilename).resize((92, 92))) > 128) * 255
+        ansObjs = len(img2RectLists(ansImg))
+
+        if ansObjs == rowPred:
+            ansScores[ansKey] += 20
+
+        if ansObjs == colPred:
+            ansScores[ansKey] += 20
+
+        if ansObjs == colPred and ansObjs == rowPred:
+            ansScores[ansKey] += 30
+
+
     # have all the figure's respective vshape representations
     # observe vshapes that appear across figures in the same row/col/diag
     # if same vshape appears in A/B/C and another appears in D/E/F,
@@ -461,16 +494,17 @@ def analyzeVisualShapes(problem, ansScores):
     rowCommon = len(vsAND(vsAND(rectSets['A'], rectSets['B']), rectSets['C'])) > 0 and len(vsAND(vsAND(rectSets['D'], rectSets['E']), rectSets['F'])) > 0
     colCommon = len(vsAND(vsAND(rectSets['A'], rectSets['D']), rectSets['G'])) > 0 and len(vsAND(vsAND(rectSets['B'], rectSets['E']), rectSets['H'])) > 0
     diag_drCommon = len(vsAND(vsAND(rectSets['B'], rectSets['F']), rectSets['G'])) > 0 and len(vsAND(vsAND(rectSets['C'], rectSets['D']), rectSets['H'])) > 0
+    diag_dlCommon = len(vsAND(vsAND(rectSets['A'], rectSets['F']), rectSets['H'])) > 0 and len(vsAND(vsAND(rectSets['C'], rectSets['E']), rectSets['G'])) > 0
 
     expect = []
 
-    if not (rowCommon or colCommon or diag_drCommon):
+    if not (rowCommon or colCommon or diag_drCommon or diag_dlCommon):
         sortAns = sorted(ansScores.items(), key=lambda x: x[1], reverse = True)
         if sortAns[0][1] > sortAns[1][1]:
             return ansScores
         else:
             raise Exception
-    
+
     if rowCommon:
         expect += vsAND(rectSets['G'], rectSets['H'])
 
@@ -479,6 +513,9 @@ def analyzeVisualShapes(problem, ansScores):
 
     if diag_drCommon:
         expect += vsAND(rectSets['A'], rectSets['E'])
+
+    if diag_dlCommon:
+        expect += vsAND(rectSets['B'], rectSets['D'])
 
     for ansNum in range(1,9):
         ansKey = str(ansNum)
